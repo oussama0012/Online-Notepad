@@ -3,24 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Online Notepad</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Professional Online Notepad</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="notepad-container">
-        <div class="sidebar">
-            <h2>Notes</h2>
-            <ul id="note-list"></ul>
-            <button id="new-note-button">New Note</button>
+    <div class="container">
+        <div class="toolbar">
+            <button onclick="formatText('bold')"><i class="fas fa-bold"></i></button>
+            <button onclick="formatText('italic')"><i class="fas fa-italic"></i></button>
+            <button onclick="formatText('underline')"><i class="fas fa-underline"></i></button>
+            <select onchange="formatText('fontSize', this.value)">
+                <option value="">Size</option>
+                <option value="1">Small</option>
+                <option value="3">Medium</option>
+                <option value="5">Large</option>
+            </select>
+            <select onchange="formatText('fontName', this.value)">
+                <option value="">Font</option>
+                <option value="Arial">Arial</option>
+                <option value="Times New Roman">Times New Roman</option>
+                <option value="Courier New">Courier New</option>
+            </select>
+            <input type="color" onchange="formatText('foreColor', this.value)">
+            <button onclick="formatText('justifyLeft')"><i class="fas fa-align-left"></i></button>
+            <button onclick="formatText('justifyCenter')"><i class="fas fa-align-center"></i></button>
+            <button onclick="formatText('justifyRight')"><i class="fas fa-align-right"></i></button>
+            <button onclick="saveFile()"><i class="fas fa-save"></i> Save</button>
+            <button onclick="loadFile()"><i class="fas fa-folder-open"></i> Open</button>
+            <button onclick="printFile()"><i class="fas fa-print"></i> Print</button>
+            <input type="text" id="filename" placeholder="File name" style="margin-left: auto;">
         </div>
-        <div class="main-content">
-            <h1>Online Notepad</h1>
-            <input type="text" id="note-title" placeholder="Note Title">
-            <textarea id="note-content" placeholder="Write your note here..."></textarea>
-            <button id="save-button">Save</button>
-            <button id="delete-button">Delete</button>
-        </div>
+        <div id="content" contenteditable="true" class="editor"></div>
     </div>
+
     <script src="script.js"></script>
 </body>
 </html>
