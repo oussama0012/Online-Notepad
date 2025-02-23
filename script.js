@@ -1,69 +1,64 @@
-document.addEventListener('DOMContentLoaded', function() {
-    let notes = [];
-    if (localStorage.getItem('notes')) {
-        notes = JSON.parse(localStorage.getItem('notes'));
+function formatText(command, value = null) {
+    document.execCommand(command, false, value);
+}
+
+function saveFile() {
+    const content = document.getElementById('content').innerHTML;
+    const filename = document.getElementById('filename').value || 'untitled';
+    
+    const blob = new Blob([content], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${filename}.html`;
+    a.click();
+    URL.revokeObjectURL(url);
+    
+    // Save to localStorage
+    localStorage.setItem(filename, content);
+}
+
+function loadFile() {
+    const filename = document.getElementById('filename').value;
+    const content = localStorage.getItem(filename);
+    if(content) {
+        document.getElementById('content').innerHTML = content;
+    } else {
+        alert('File not found!');
     }
-    let currentNoteIndex = -1;
+}
 
-    function populateNoteList() {
-        const noteList = document.getElementById('note-list');
-        noteList.innerHTML = '';
-        notes.forEach(function(note, index) {
-            const li = document.createElement('li');
-            li.textContent = note.title || 'Untitled';
-            li.classList.toggle('selected', index === currentNoteIndex);
-            li.addEventListener('click', function() {
-                loadNote(index);
-            });
-            noteList.appendChild(li);
-        });
+function printFile() {
+    const content = document.getElementById('content').innerHTML;
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+        <html>
+            <head>
+                <title>Print Document</title>
+            </head>
+            <body>${content}</body>
+        </html>
+    `);
+    printWindow.document.close();
+    printWindow.print();
+}
+
+// Auto-save every 30 seconds
+setInterval(() => {
+    if(document.getElementById('filename').value) {
+        saveFile();
     }
+}, 30000);
 
-    function loadNote(index) {
-        currentNoteIndex = index;
-        const note = notes[index];
-        document.getElementById('note-title').value = note.title || '';
-        document.getElementById('note-content').value = note.content || '';
-        populateNoteList(); // Update the list to show the selected note
-    }
+// Initialize from localStorage
+window.onload = function() {
+    document.getElementById('content').focus();
+}
 
-    document.getElementById('new-note-button').addEventListener('click', function() {
-        const newNote = { title: '', content: '' };
-        notes.push(newNote);
-        currentNoteIndex = notes.length - 1;
-        document.getElementById('note-title').value = '';
-        document.getElementById('note-content').value = '';
-        populateNoteList();
-    });
-
-    document.getElementById('save-button').addEventListener('click', function() {
-        if (currentNoteIndex >= 0) {
-            notes[currentNoteIndex].title = document.getElementById('note-title').value;
-            notes[currentNoteIndex].content = document.getElementById('note-content').value;
-            localStorage.setItem('notes', JSON.stringify(notes));
-            populateNoteList();
-            alert('Note saved!');
-        } else {
-            alert('Please select a note to save.');
-        }
-    });
-
-    document.getElementById('delete-button').addEventListener('click', function() {
-        if (currentNoteIndex >= 0) {
-            notes.splice(currentNoteIndex, 1);
-            localStorage.setItem('notes', JSON.stringify(notes));
-            populateNoteList();
-            document.getElementById('note-title').value = '';
-            document.getElementById('note-content').value = '';
-            currentNoteIndex = -1;
-        } else {
-            alert('Please select a note to delete.');
-        }
-    });
-
-    // Initial population of the note list and load the first note if available
-    populateNoteList();
-    if (notes.length > 0) {
-        loadNote(0);
+// Keyboard shortcuts
+document.addEventListener('keydown', (e) => {
+    if((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        saveFile();
     }
 });
