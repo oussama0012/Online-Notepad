@@ -4,15 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Online Notepad</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Online Notepad</h1>
-        <textarea id="notepad" placeholder="Start typing..."></textarea>
-        <div class="buttons">
-            <button onclick="saveText()">Save</button>
-            <button onclick="clearText()">Clear</button>
+    <div class="notepad-container">
+        <div class="sidebar">
+            <h2>Notes</h2>
+            <ul id="note-list"></ul>
+            <button id="new-note-button">New Note</button>
+        </div>
+        <div class="main-content">
+            <h1>Online Notepad</h1>
+            <input type="text" id="note-title" placeholder="Note Title">
+            <textarea id="note-content" placeholder="Write your note here..."></textarea>
+            <button id="save-button">Save</button>
+            <button id="delete-button">Delete</button>
         </div>
     </div>
     <script src="script.js"></script>
