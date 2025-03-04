@@ -1,50 +1,71 @@
 // File Management
-let currentFile = "Untitled";
 let files = [];
+let currentFileIndex = -1;
 
 const editor = document.getElementById('editor');
-const currentFileName = document.getElementById('current-file-name');
-const oldFilesList = document.getElementById('old-files-list');
+const fileList = document.getElementById('file-list');
 const newFileBtn = document.getElementById('new-file-btn');
+const saveBtn = document.getElementById('save-btn');
 
-// New File Button Functionality
+// Create New File
 newFileBtn.addEventListener('click', () => {
-    // Save the current file to the old files list
-    if (editor.innerHTML.trim() !== "") {
-        files.push({ name: currentFile, content: editor.innerHTML });
-        updateOldFilesList();
-    }
-
-    // Clear the editor and reset the current file name
+    const fileName = `File ${files.length + 1}`;
+    files.push({ name: fileName, content: '' });
+    currentFileIndex = files.length - 1;
+    updateFileList();
     editor.innerHTML = '';
-    currentFile = "Untitled";
-    currentFileName.textContent = currentFile;
-    localStorage.removeItem('noteContent');
     editor.focus();
 });
 
-// Update Old Files List
-function updateOldFilesList() {
-    oldFilesList.innerHTML = files
-        .map((file, index) => `<li onclick="loadFile(${index})">${file.name}</li>`)
+// Save File
+saveBtn.addEventListener('click', () => {
+    if (currentFileIndex !== -1) {
+        files[currentFileIndex].content = editor.innerHTML;
+        updateFileList();
+    }
+});
+
+// Update File List
+function updateFileList() {
+    fileList.innerHTML = files
+        .map((file, index) => `
+            <li class="${index === currentFileIndex ? 'active' : ''}" onclick="loadFile(${index})">
+                ${file.name}
+            </li>
+        `)
         .join('');
 }
 
-// Load File from Old Files List
+// Load File
 function loadFile(index) {
-    const file = files[index];
-    editor.innerHTML = file.content;
-    currentFile = file.name;
-    currentFileName.textContent = currentFile;
+    currentFileIndex = index;
+    editor.innerHTML = files[index].content;
+    updateFileList();
 }
 
-// Save Content to Local Storage
-editor.addEventListener('input', () => {
-    localStorage.setItem('noteContent', editor.innerHTML);
-});
-
-// Load Saved Content
-const savedContent = localStorage.getItem('noteContent');
-if (savedContent) {
-    editor.innerHTML = savedContent;
+// Load Saved Files from Local Storage
+function loadSavedFiles() {
+    const savedFiles = JSON.parse(localStorage.getItem('files')) || [];
+    files = savedFiles;
+    if (files.length > 0) {
+        currentFileIndex = 0;
+        editor.innerHTML = files[0].content;
+    }
+    updateFileList();
 }
+
+// Save Files to Local Storage
+function saveFilesToLocalStorage() {
+    localStorage.setItem('files', JSON.stringify(files));
+}
+
+// Auto-save every 5 seconds
+setInterval(() => {
+    if (currentFileIndex !== -1) {
+        files[currentFileIndex].content = editor.innerHTML;
+        saveFilesToLocalStorage();
+    }
+}, 5000);
+
+// Load saved files on page load
+loadSavedFiles();
