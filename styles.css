@@ -36,6 +36,16 @@ body.dark-mode .container {
     flex-wrap: wrap;
     gap: 10px;
     margin-bottom: 20px;
+    padding: 10px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Added shadow */
+    transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+body.dark-mode .toolbar {
+    background-color: #2d2d2d;
+    box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1); /* Adjusted shadow for dark mode */
 }
 
 .toolbar-btn, .toolbar-select {
