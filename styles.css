@@ -98,3 +98,23 @@ body.dark-mode .editor {
     content: attr(placeholder);
     color: #999;
 }
+
+/* Ad Banners */
+.ad-banner-top {
+    text-align: center;
+    margin: 20px auto;
+}
+
+.ad-banner-left, .ad-banner-right {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.ad-banner-left {
+    left: 10px;
+}
+
+.ad-banner-right {
+    right: 10px;
+}
