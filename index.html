@@ -5,26 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NoteSpace</title>
     <link rel="stylesheet" href="styles.css">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
     <div class="container">
-        <header class="header">
-            <h1>NoteSpace</h1>
-            <button id="new-note-btn" class="btn">+ New Note</button>
-        </header>
-        <main class="notes-grid" id="notes-grid">
-            <!-- Notes will be dynamically added here -->
-        </main>
-    </div>
-
-    <!-- Modal for creating/editing notes -->
-    <div id="note-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-btn">&times;</span>
-            <h2 id="modal-title">New Note</h2>
-            <textarea id="note-input" placeholder="Write your note here..."></textarea>
-            <button id="save-note-btn" class="btn">Save Note</button>
+        <!-- Toolbar -->
+        <div class="toolbar">
+            <button id="bold-btn" class="toolbar-btn" title="Bold"><i class="fas fa-bold"></i></button>
+            <button id="italic-btn" class="toolbar-btn" title="Italic"><i class="fas fa-italic"></i></button>
+            <button id="underline-btn" class="toolbar-btn" title="Underline"><i class="fas fa-underline"></i></button>
+            <button id="strike-btn" class="toolbar-btn" title="Strikethrough"><i class="fas fa-strikethrough"></i></button>
+            <button id="list-ul-btn" class="toolbar-btn" title="Bullet List"><i class="fas fa-list-ul"></i></button>
+            <button id="list-ol-btn" class="toolbar-btn" title="Numbered List"><i class="fas fa-list-ol"></i></button>
+            <button id="link-btn" class="toolbar-btn" title="Insert Link"><i class="fas fa-link"></i></button>
+            <button id="image-btn" class="toolbar-btn" title="Insert Image"><i class="fas fa-image"></i></button>
+            <button id="undo-btn" class="toolbar-btn" title="Undo"><i class="fas fa-undo"></i></button>
+            <button id="redo-btn" class="toolbar-btn" title="Redo"><i class="fas fa-redo"></i></button>
+            <button id="dark-mode-btn" class="toolbar-btn" title="Toggle Dark Mode"><i class="fas fa-moon"></i></button>
         </div>
+
+        <!-- Rich Text Editor -->
+        <div id="editor" contenteditable="true" class="editor" placeholder="Start typing your note..."></div>
     </div>
 
     <script src="script.js"></script>
