@@ -3,40 +3,113 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Professional Online Notepad</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    <title>NoteSpace | Professional Online Notepad</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <div class="toolbar">
-            <button onclick="formatText('bold')"><i class="fas fa-bold"></i></button>
-            <button onclick="formatText('italic')"><i class="fas fa-italic"></i></button>
-            <button onclick="formatText('underline')"><i class="fas fa-underline"></i></button>
-            <select onchange="formatText('fontSize', this.value)">
-                <option value="">Size</option>
-                <option value="1">Small</option>
-                <option value="3">Medium</option>
-                <option value="5">Large</option>
-            </select>
-            <select onchange="formatText('fontName', this.value)">
-                <option value="">Font</option>
-                <option value="Arial">Arial</option>
-                <option value="Times New Roman">Times New Roman</option>
-                <option value="Courier New">Courier New</option>
-            </select>
-            <input type="color" onchange="formatText('foreColor', this.value)">
-            <button onclick="formatText('justifyLeft')"><i class="fas fa-align-left"></i></button>
-            <button onclick="formatText('justifyCenter')"><i class="fas fa-align-center"></i></button>
-            <button onclick="formatText('justifyRight')"><i class="fas fa-align-right"></i></button>
-            <button onclick="saveFile()"><i class="fas fa-save"></i> Save</button>
-            <button onclick="loadFile()"><i class="fas fa-folder-open"></i> Open</button>
-            <button onclick="printFile()"><i class="fas fa-print"></i> Print</button>
-            <input type="text" id="filename" placeholder="File name" style="margin-left: auto;">
+    <div class="header">
+        <div class="logo">
+            <span class="logo-icon">📝</span>
+            <span>NoteSpace</span>
         </div>
-        <div id="content" contenteditable="true" class="editor"></div>
+        <div class="actions">
+            <button class="btn btn-outline" id="btnNewNote">
+                <span>+</span>
+                <span>New Note</span>
+            </button>
+            <button class="btn btn-primary" id="btnSave">
+                <span>💾</span>
+                <span>Save</span>
+            </button>
+            <div class="settings-menu">
+                <button class="btn btn-outline" id="btnSettings">
+                    <span>⚙️</span>
+                    <span>Settings</span>
+                </button>
+                <div class="settings-dropdown" id="settingsDropdown">
+                    <button id="btnToggleDarkMode">Toggle Dark Mode</button>
+                    <button id="btnExportNotes">Export Notes</button>
+                    <button id="btnImportNotes">Import Notes</button>
+                </div>
+            </div>
+        </div>
     </div>
-
+    
+    <div class="main">
+        <div class="sidebar">
+            <div class="sidebar-title">My Notes</div>
+            <div class="notes-list" id="notesList">
+                <!-- Notes will be dynamically added here -->
+            </div>
+        </div>
+        
+        <div class="editor-container">
+            <div class="editor-toolbar">
+                <select class="toolbar-select" id="fontSelect">
+                    <option value="Segoe UI">Segoe UI</option>
+                    <option value="Arial">Arial</option>
+                    <option value="Georgia">Georgia</option>
+                    <option value="Courier New">Courier New</option>
+                    <option value="Times New Roman">Times New Roman</option>
+                </select>
+                
+                <select class="toolbar-select" id="fontSizeSelect">
+                    <option value="12px">12px</option>
+                    <option value="14px" selected>14px</option>
+                    <option value="16px">16px</option>
+                    <option value="18px">18px</option>
+                    <option value="20px">20px</option>
+                </select>
+                
+                <button class="toolbar-btn" data-command="bold" title="Bold">B</button>
+                <button class="toolbar-btn" data-command="italic" title="Italic"><i>I</i></button>
+                <button class="toolbar-btn" data-command="underline" title="Underline"><u>U</u></button>
+                <button class="toolbar-btn" data-command="strikeThrough" title="Strikethrough"><s>S</s></button>
+                <button class="toolbar-btn" data-command="justifyLeft" title="Align Left">⮜</button>
+                <button class="toolbar-btn" data-command="justifyCenter" title="Align Center">⮹</button>
+                <button class="toolbar-btn" data-command="justifyRight" title="Align Right">⮞</button>
+                <button class="toolbar-btn" data-command="insertUnorderedList" title="Bullet List">•</button>
+                <button class="toolbar-btn" data-command="insertOrderedList" title="Numbered List">1.</button>
+                <button class="toolbar-btn" data-command="createLink" title="Insert Link">🔗</button>
+            </div>
+            
+            <div id="editor" contenteditable="true"></div>
+            
+            <div class="status-bar">
+                <div id="wordCount">Words: 0</div>
+                <div>
+                    <span id="savedStatus">Unsaved</span>
+                    <span class="separator">|</span>
+                    <span id="currentTime">00:00:00</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- New Note Modal -->
+    <div class="modal" id="newNoteModal">
+        <div class="modal-content fade-in">
+            <div class="modal-header">
+                <h2 class="modal-title">Create New Note</h2>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="noteTitle" class="form-label">Note Title</label>
+                    <input type="text" id="noteTitle" class="form-control" placeholder="Enter note title">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="btnCancelNote">Cancel</button>
+                <button class="btn btn-primary" id="btnCreateNote">Create</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Save Indicator -->
+    <div class="save-indicator" id="saveIndicator">
+        Note saved successfully!
+    </div>
+    
     <script src="script.js"></script>
 </body>
 </html>
