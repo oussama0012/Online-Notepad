@@ -31,6 +31,10 @@ function updateFileList() {
         .map((file, index) => `
             <li class="${index === currentFileIndex ? 'active' : ''}" onclick="loadFile(${index})">
                 ${file.name}
+                <div class="file-actions">
+                    <button onclick="renameFile(${index})"><i class="fas fa-edit"></i></button>
+                    <button onclick="deleteFile(${index})"><i class="fas fa-trash"></i></button>
+                </div>
             </li>
         `)
         .join('');
@@ -41,6 +45,27 @@ function loadFile(index) {
     currentFileIndex = index;
     editor.innerHTML = files[index].content;
     updateFileList();
+}
+
+// Rename File
+function renameFile(index) {
+    const newName = prompt('Enter new file name:', files[index].name);
+    if (newName) {
+        files[index].name = newName;
+        updateFileList();
+    }
+}
+
+// Delete File
+function deleteFile(index) {
+    if (confirm('Are you sure you want to delete this file?')) {
+        files.splice(index, 1);
+        if (currentFileIndex === index) {
+            currentFileIndex = -1;
+            editor.innerHTML = '';
+        }
+        updateFileList();
+    }
 }
 
 // Load Saved Files from Local Storage
