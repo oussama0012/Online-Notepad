@@ -33,31 +33,42 @@ body.dark-mode .container {
 
 .toolbar {
     display: flex;
+    flex-wrap: wrap;
     gap: 10px;
     margin-bottom: 20px;
 }
 
-.toolbar-btn {
+.toolbar-btn, .toolbar-select {
     background: none;
-    border: none;
+    border: 1px solid #ddd;
     color: #333333;
-    font-size: 16px;
+    font-size: 14px;
     cursor: pointer;
     padding: 8px;
     border-radius: 5px;
     transition: background-color 0.3s, color 0.3s;
 }
 
-.toolbar-btn:hover {
+.toolbar-btn:hover, .toolbar-select:hover {
     background-color: #f0f0f0;
 }
 
-body.dark-mode .toolbar-btn {
+body.dark-mode .toolbar-btn, body.dark-mode .toolbar-select {
     color: #e0e0e0;
+    border-color: #444444;
 }
 
-body.dark-mode .toolbar-btn:hover {
+body.dark-mode .toolbar-btn:hover, body.dark-mode .toolbar-select:hover {
     background-color: #444444;
+}
+
+.toolbar-select {
+    background-color: #ffffff;
+}
+
+body.dark-mode .toolbar-select {
+    background-color: #2d2d2d;
+    color: #e0e0e0;
 }
 
 .editor {
