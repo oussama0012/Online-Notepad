@@ -22,14 +22,24 @@
         </script>
     </div>
 
-    <!-- New File Button (Left Side) -->
-    <div class="new-file-button">
-        <button id="new-file-btn" title="New File"><i class="fas fa-file"></i> New File</button>
+    <!-- Left Sidebar for Files -->
+    <div class="sidebar">
+        <div class="current-file">
+            <h3>Current File</h3>
+            <p id="current-file-name">Untitled</p>
+        </div>
+        <div class="old-files">
+            <h3>Old Files</h3>
+            <ul id="old-files-list"></ul>
+        </div>
     </div>
 
     <div class="container">
         <!-- Toolbar -->
         <div class="toolbar">
+            <!-- New File Button -->
+            <button id="new-file-btn" class="toolbar-btn" title="New File"><i class="fas fa-file"></i> New File</button>
+
             <!-- Text Formatting -->
             <button id="bold-btn" class="toolbar-btn" title="Bold"><i class="fas fa-bold"></i></button>
             <button id="italic-btn" class="toolbar-btn" title="Italic"><i class="fas fa-italic"></i></button>
