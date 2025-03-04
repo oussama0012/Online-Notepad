@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="styles.css">
     <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Google AdSense Script -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_AD_CLIENT_ID" crossorigin="anonymous"></script>
 </head>
 <body>
     <!-- Sidebar -->
@@ -22,6 +24,17 @@
 
     <!-- Main Content -->
     <div class="main-content">
+        <!-- Google AdSense Banner (728x90) Above Toolbar -->
+        <div class="ad-banner-top">
+            <ins class="adsbygoogle"
+                 style="display:inline-block;width:728px;height:90px"
+                 data-ad-client="ca-pub-YOUR_AD_CLIENT_ID"
+                 data-ad-slot="YOUR_AD_SLOT_ID_TOP"></ins>
+            <script>
+                 (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+
         <!-- Toolbar -->
         <div class="toolbar">
             <button id="bold-btn" class="toolbar-btn" title="Bold"><i class="fas fa-bold"></i></button>
@@ -60,6 +73,17 @@
 
         <!-- Editor -->
         <div id="editor" contenteditable="true" class="editor" placeholder="Start typing your note..."></div>
+    </div>
+
+    <!-- Google AdSense Banner (120x600) on Right Side -->
+    <div class="ad-banner-right">
+        <ins class="adsbygoogle"
+             style="display:inline-block;width:120px;height:600px"
+             data-ad-client="ca-pub-YOUR_AD_CLIENT_ID"
+             data-ad-slot="YOUR_AD_SLOT_ID_RIGHT"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
     </div>
 
     <script src="script.js"></script>
