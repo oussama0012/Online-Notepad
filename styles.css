@@ -39,13 +39,13 @@ body.dark-mode .container {
     padding: 10px;
     background-color: #ffffff;
     border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Added shadow */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     transition: background-color 0.3s, box-shadow 0.3s;
 }
 
 body.dark-mode .toolbar {
     background-color: #2d2d2d;
-    box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1); /* Adjusted shadow for dark mode */
+    box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1);
 }
 
 .toolbar-btn, .toolbar-select {
@@ -115,16 +115,42 @@ body.dark-mode .editor {
     margin: 20px auto;
 }
 
-.ad-banner-left, .ad-banner-right {
+.ad-banner-right {
     position: fixed;
     top: 50%;
+    right: 10px;
     transform: translateY(-50%);
 }
 
-.ad-banner-left {
+/* New File Button */
+.new-file-button {
+    position: fixed;
+    top: 50%;
     left: 10px;
+    transform: translateY(-50%);
 }
 
-.ad-banner-right {
-    right: 10px;
+.new-file-button button {
+    background-color: #007bff;
+    color: #ffffff;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+.new-file-button button:hover {
+    background-color: #0056b3;
+}
+
+body.dark-mode .new-file-button button {
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+    border: 1px solid #444444;
+}
+
+body.dark-mode .new-file-button button:hover {
+    background-color: #444444;
 }
