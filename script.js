@@ -38,12 +38,64 @@ newFileBtn.addEventListener('click', () => {
 
 // Save File
 saveBtn.addEventListener('click', () => {
-    if (currentFileIndex !== -1) {
-        files[currentFileIndex].content = editor.innerHTML;
+    const content = editor.innerHTML.trim();
+
+    if (content === '') {
+        alert('Cannot save an empty file!');
+        return;
+    }
+
+    if (currentFileIndex === -1) {
+        // No file is currently selected
+        if (files.length === 0) {
+            // No files exist, create a new one
+            const fileName = `File ${files.length + 1}`;
+            files.push({ name: fileName, content });
+            currentFileIndex = files.length - 1;
+            updateFileList();
+            alert('File saved successfully!');
+        } else {
+            // Ask the user if they want to save to a new file or an existing one
+            const saveOption = prompt(
+                'Do you want to save to a (1) New File or (2) Existing File? Enter 1 or 2:'
+            );
+
+            if (saveOption === '1') {
+                // Save to a new file
+                const fileName = `File ${files.length + 1}`;
+                files.push({ name: fileName, content });
+                currentFileIndex = files.length - 1;
+                updateFileList();
+                alert('File saved successfully!');
+            } else if (saveOption === '2') {
+                // Save to an existing file
+                if (files.length > 0) {
+                    const fileNames = files.map((file, index) => `${index + 1}. ${file.name}`).join('\n');
+                    const fileIndex = prompt(
+                        `Select a file to save to:\n${fileNames}\nEnter the file number:`
+                    );
+
+                    if (fileIndex && fileIndex >= 1 && fileIndex <= files.length) {
+                        files[fileIndex - 1].content = content;
+                        currentFileIndex = fileIndex - 1;
+                        updateFileList();
+                        alert('File saved successfully!');
+                    } else {
+                        alert('Invalid file selection!');
+                    }
+                }
+            } else {
+                alert('Invalid option!');
+            }
+        }
+    } else {
+        // Save to the current file
+        files[currentFileIndex].content = content;
         updateFileList();
-        saveFilesToLocalStorage();
         alert('File saved successfully!');
     }
+
+    saveFilesToLocalStorage();
 });
 
 // Update File List
