@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modern Notepad</title>
+    <title>NoteSpace</title>
     <link rel="stylesheet" href="styles.css">
     <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -22,26 +22,10 @@
         </script>
     </div>
 
-    <!-- Notice for Users -->
-    <div class="notice">
-        <p>If the save button doesn't work, refresh the page and try again. Your work is auto-saved every 5 seconds.</p>
-    </div>
-
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <h2>Files</h2>
-            <button id="new-file-btn" class="new-file-btn"><i class="fas fa-plus"></i> New File</button>
-        </div>
-        <ul id="file-list" class="file-list">
-            <!-- Files will be dynamically added here -->
-        </ul>
-    </div>
-
-    <!-- Main Content -->
-    <div class="main-content">
+    <div class="container">
         <!-- Toolbar -->
         <div class="toolbar">
+            <!-- Text Formatting -->
             <button id="bold-btn" class="toolbar-btn" title="Bold"><i class="fas fa-bold"></i></button>
             <button id="italic-btn" class="toolbar-btn" title="Italic"><i class="fas fa-italic"></i></button>
             <button id="underline-btn" class="toolbar-btn" title="Underline"><i class="fas fa-underline"></i></button>
@@ -50,10 +34,14 @@
             <button id="list-ol-btn" class="toolbar-btn" title="Numbered List"><i class="fas fa-list-ol"></i></button>
             <button id="link-btn" class="toolbar-btn" title="Insert Link"><i class="fas fa-link"></i></button>
             <button id="image-btn" class="toolbar-btn" title="Insert Image"><i class="fas fa-image"></i></button>
+
+            <!-- Text Alignment -->
             <button id="align-left-btn" class="toolbar-btn" title="Align Left"><i class="fas fa-align-left"></i></button>
             <button id="align-center-btn" class="toolbar-btn" title="Align Center"><i class="fas fa-align-center"></i></button>
             <button id="align-right-btn" class="toolbar-btn" title="Align Right"><i class="fas fa-align-right"></i></button>
             <button id="align-justify-btn" class="toolbar-btn" title="Justify"><i class="fas fa-align-justify"></i></button>
+
+            <!-- Font Size and Family -->
             <select id="font-size" class="toolbar-select" title="Font Size">
                 <option value="1">8px</option>
                 <option value="2">10px</option>
@@ -70,17 +58,32 @@
                 <option value="Verdana">Verdana</option>
                 <option value="Georgia">Georgia</option>
             </select>
+
+            <!-- Undo/Redo -->
             <button id="undo-btn" class="toolbar-btn" title="Undo"><i class="fas fa-undo"></i></button>
             <button id="redo-btn" class="toolbar-btn" title="Redo"><i class="fas fa-redo"></i></button>
+
+            <!-- Dark Mode -->
             <button id="dark-mode-btn" class="toolbar-btn" title="Toggle Dark Mode"><i class="fas fa-moon"></i></button>
-            <button id="save-btn" class="toolbar-btn" title="Save File"><i class="fas fa-save"></i></button>
+
+            <!-- Save/Download -->
+            <button id="save-btn" class="toolbar-btn" title="Save Note"><i class="fas fa-save"></i></button>
         </div>
 
-        <!-- Editor -->
+        <!-- Rich Text Editor -->
         <div id="editor" contenteditable="true" class="editor" placeholder="Start typing your note..."></div>
     </div>
 
-    <!-- Google AdSense Banner (120x600) on Right Side -->
+    <!-- Google AdSense Banners (120x600) on Both Sides -->
+    <div class="ad-banner-left">
+        <ins class="adsbygoogle"
+             style="display:inline-block;width:120px;height:600px"
+             data-ad-client="ca-pub-YOUR_AD_CLIENT_ID"
+             data-ad-slot="YOUR_AD_SLOT_ID_LEFT"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+    </div>
     <div class="ad-banner-right">
         <ins class="adsbygoogle"
              style="display:inline-block;width:120px;height:600px"
