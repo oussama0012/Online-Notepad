@@ -34,6 +34,7 @@ newFileBtn.addEventListener('click', () => {
     updateFileList();
     editor.innerHTML = '';
     editor.focus();
+    saveFilesToLocalStorage(); // Save to local storage
 });
 
 // Save File
@@ -95,7 +96,7 @@ saveBtn.addEventListener('click', () => {
         alert('File saved successfully!');
     }
 
-    saveFilesToLocalStorage();
+    saveFilesToLocalStorage(); // Save to local storage
 });
 
 // Update File List
@@ -126,6 +127,7 @@ function renameFile(index) {
     if (newName) {
         files[index].name = newName;
         updateFileList();
+        saveFilesToLocalStorage(); // Save to local storage
     }
 }
 
@@ -138,6 +140,7 @@ function deleteFile(index) {
             editor.innerHTML = '';
         }
         updateFileList();
+        saveFilesToLocalStorage(); // Save to local storage
     }
 }
 
