@@ -36,7 +36,7 @@ newFileBtn.addEventListener('click', () => {
     editor.focus();
 });
 
-// Save File
+// Improved Save Function
 saveBtn.addEventListener('click', () => {
     const content = editor.innerHTML.trim();
 
@@ -45,57 +45,19 @@ saveBtn.addEventListener('click', () => {
         return;
     }
 
+    // If no file is currently selected, create a new file
     if (currentFileIndex === -1) {
-        // No file is currently selected
-        if (files.length === 0) {
-            // No files exist, create a new one
-            const fileName = `File ${files.length + 1}`;
-            files.push({ name: fileName, content });
-            currentFileIndex = files.length - 1;
-            updateFileList();
-            alert('File saved successfully!');
-        } else {
-            // Ask the user if they want to save to a new file or an existing one
-            const saveOption = prompt(
-                'Do you want to save to a (1) New File or (2) Existing File? Enter 1 or 2:'
-            );
-
-            if (saveOption === '1') {
-                // Save to a new file
-                const fileName = `File ${files.length + 1}`;
-                files.push({ name: fileName, content });
-                currentFileIndex = files.length - 1;
-                updateFileList();
-                alert('File saved successfully!');
-            } else if (saveOption === '2') {
-                // Save to an existing file
-                if (files.length > 0) {
-                    const fileNames = files.map((file, index) => `${index + 1}. ${file.name}`).join('\n');
-                    const fileIndex = prompt(
-                        `Select a file to save to:\n${fileNames}\nEnter the file number:`
-                    );
-
-                    if (fileIndex && fileIndex >= 1 && fileIndex <= files.length) {
-                        files[fileIndex - 1].content = content;
-                        currentFileIndex = fileIndex - 1;
-                        updateFileList();
-                        alert('File saved successfully!');
-                    } else {
-                        alert('Invalid file selection!');
-                    }
-                }
-            } else {
-                alert('Invalid option!');
-            }
-        }
+        const fileName = `File ${files.length + 1}`;
+        files.push({ name: fileName, content });
+        currentFileIndex = files.length - 1;
     } else {
-        // Save to the current file
+        // Update existing file
         files[currentFileIndex].content = content;
-        updateFileList();
-        alert('File saved successfully!');
     }
 
+    updateFileList();
     saveFilesToLocalStorage();
+    alert('File saved successfully!');
 });
 
 // Update File List
@@ -130,46 +92,59 @@ function renameFile(index) {
     }
 }
 
-// Delete File
+// Improved Delete File Function
 function deleteFile(index) {
     if (confirm('Are you sure you want to delete this file?')) {
         files.splice(index, 1);
-        if (currentFileIndex === index) {
+
+        // Adjust currentFileIndex
+        if (files.length === 0) {
+            // No files left
             currentFileIndex = -1;
             editor.innerHTML = '';
+        } else if (currentFileIndex >= files.length) {
+            // If deleted file was the last one, select the last remaining file
+            currentFileIndex = files.length - 1;
+            editor.innerHTML = files[currentFileIndex].content;
         } else if (currentFileIndex > index) {
+            // Adjust index if file before current was deleted
             currentFileIndex--;
         }
+
         updateFileList();
         saveFilesToLocalStorage();
-
-        // If no files are left, reset the editor and currentFileIndex
-        if (files.length === 0) {
-            currentFileIndex = -1;
-            editor.innerHTML = '';
-        }
     }
 }
 
-// Load Saved Files from Local Storage
+// Improved Load Saved Files Function
 function loadSavedFiles() {
     const savedFiles = JSON.parse(localStorage.getItem('files')) || [];
     files = savedFiles;
+    
     if (files.length > 0) {
         currentFileIndex = 0;
         editor.innerHTML = files[0].content;
+    } else {
+        currentFileIndex = -1;
+        editor.innerHTML = '';
     }
+    
     updateFileList();
 }
 
 // Save Files to Local Storage
 function saveFilesToLocalStorage() {
-    localStorage.setItem('files', JSON.stringify(files));
+    try {
+        localStorage.setItem('files', JSON.stringify(files));
+    } catch (error) {
+        console.error('Error saving to localStorage:', error);
+        alert('Unable to save files. Local storage might be full or disabled.');
+    }
 }
 
-// Auto-save every 5 seconds
+// Improved Auto-save Function
 setInterval(() => {
-    if (currentFileIndex !== -1) {
+    if (currentFileIndex !== -1 && editor.innerHTML.trim() !== '') {
         files[currentFileIndex].content = editor.innerHTML;
         saveFilesToLocalStorage();
     }
@@ -215,5 +190,7 @@ redoBtn.addEventListener('click', () => document.execCommand('redo', false, null
 // Dark Mode Toggle
 darkModeBtn.addEventListener('click', () => {
     document.body.classList.toggle('dark-mode');
-    darkModeBtn.innerHTML = document.body.classList.contains('dark-mode') ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+    darkModeBtn.innerHTML = document.body.classList.contains('dark-mode') 
+        ? '<i class="fas fa-sun"></i>' 
+        : '<i class="fas fa-moon"></i>';
 });
