@@ -138,11 +138,10 @@ function deleteFile(index) {
             currentFileIndex = -1;
             editor.innerHTML = '';
         } else if (currentFileIndex > index) {
-            // Adjust currentFileIndex if the deleted file was before the current file
             currentFileIndex--;
         }
         updateFileList();
-        saveFilesToLocalStorage(); // Save changes to localStorage
+        saveFilesToLocalStorage();
 
         // If no files are left, reset the editor and currentFileIndex
         if (files.length === 0) {
