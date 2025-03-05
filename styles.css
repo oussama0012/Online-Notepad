@@ -14,6 +14,101 @@ body {
     overflow: hidden;
 }
 
+/* Notification Container */
+#notification-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+/* Notification Styles */
+.notification {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    padding: 15px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    min-width: 250px;
+    max-width: 350px;
+    opacity: 0;
+    transform: translateX(100%);
+    transition: all 0.5s ease;
+    border-left: 4px solid;
+}
+
+.notification.info {
+    border-left-color: #3498db;
+}
+
+.notification.success {
+    border-left-color: #2ecc71;
+}
+
+.notification.warning {
+    border-left-color: #f39c12;
+}
+
+.notification.error {
+    border-left-color: #e74c3c;
+}
+
+.notification:not(.fade-out) {
+    animation: slideIn 0.5s forwards;
+}
+
+.notification.fade-out {
+    opacity: 0;
+    transform: translateX(100%);
+}
+
+.notification-content {
+    display: flex;
+    align-items: center;
+}
+
+.notification-icon {
+    margin-right: 10px;
+    font-size: 24px;
+}
+
+.notification.info .notification-icon {
+    color: #3498db;
+}
+
+.notification.success .notification-icon {
+    color: #2ecc71;
+}
+
+.notification.warning .notification-icon {
+    color: #f39c12;
+}
+
+.notification.error .notification-icon {
+    color: #e74c3c;
+}
+
+.notification-message {
+    font-size: 14px;
+    color: #333;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
 /* Sidebar */
 .sidebar {
     width: 250px;
@@ -144,20 +239,7 @@ body {
     color: #999;
 }
 
-/* Ad Banners */
-.ad-banner-top {
-    text-align: center;
-    margin: 20px auto;
-}
-
-.ad-banner-right {
-    position: fixed;
-    top: 50%;
-    right: 10px;
-    transform: translateY(-50%);
-}
-
-/* New Notice Styling */
+/* Notepad Notice */
 .notepad-notice {
     background-color: #ffff99;
     border: 1px solid #ffd700;
@@ -170,6 +252,19 @@ body {
     max-width: 728px;
     margin-left: auto;
     margin-right: auto;
+}
+
+/* Ad Banners */
+.ad-banner-top {
+    text-align: center;
+    margin: 20px auto;
+}
+
+.ad-banner-right {
+    position: fixed;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
 }
 
 /* Dark Mode */
@@ -200,5 +295,15 @@ body.dark-mode .editor {
 body.dark-mode .notepad-notice {
     background-color: #555;
     border-color: #777;
+    color: #fff;
+}
+
+/* Dark Mode Notification Adjustments */
+body.dark-mode .notification {
+    background-color: #444;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+body.dark-mode .notification-message {
     color: #fff;
 }
