@@ -1,309 +1,239 @@
-/* General Reset */
-* {
-    margin: 0;
-    padding: 0;
+body {
+    font-family: 'Arial', sans-serif;
+}
+
+#editor {
+    min-height: 300px;
+}
+
+/* Modal Styles */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1000; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+.modal-content {
+    position: relative;
+    background-color: #fefefe;
+    margin: 15% auto; /* 15% from the top and centered */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 500px;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+    animation-name: animatetop;
+    animation-duration: 0.4s;
+    border-radius: 0.5rem;
+}
+
+/* Add Animation */
+@keyframes animatetop {
+    from {top: -300px; opacity: 0}
+    to {top: 15%; opacity: 1}
+}
+
+/* The Close Button */
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.modal-input {
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 0.25rem;
+    width: 100%;
     box-sizing: border-box;
 }
 
-body {
-    font-family: 'Arial', sans-serif;
-    background-color: #ffffff;
-    color: #333333;
-    display: flex;
-    height: 100vh;
-    overflow: hidden;
+.modal-buttons {
+    text-align: right;
 }
 
-/* Notification Container */
-#notification-container {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 1000;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
+.modal-buttons button {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    margin-left: 0.5rem;
 }
 
-/* Notification Styles */
-.notification {
-    background-color: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    padding: 15px;
-    margin-bottom: 10px;
-    display: flex;
-    align-items: center;
-    min-width: 250px;
-    max-width: 350px;
-    opacity: 0;
-    transform: translateX(100%);
-    transition: all 0.5s ease;
-    border-left: 4px solid;
+.modal-buttons button.confirm {
+    background-color: #5cb85c;
+    color: white;
 }
 
-.notification.info {
-    border-left-color: #3498db;
+.modal-buttons button.cancel {
+    background-color: #d9534f;
+    color: white;
 }
 
-.notification.success {
-    border-left-color: #2ecc71;
+/* Updated File List Styles */
+#fileList {
+    list-style: none;
+    padding: 0;
 }
 
-.notification.warning {
-    border-left-color: #f39c12;
-}
-
-.notification.error {
-    border-left-color: #e74c3c;
-}
-
-.notification:not(.fade-out) {
-    animation: slideIn 0.5s forwards;
-}
-
-.notification.fade-out {
-    opacity: 0;
-    transform: translateX(100%);
-}
-
-.notification-content {
-    display: flex;
-    align-items: center;
-}
-
-.notification-icon {
-    margin-right: 10px;
-    font-size: 24px;
-}
-
-.notification.info .notification-icon {
-    color: #3498db;
-}
-
-.notification.success .notification-icon {
-    color: #2ecc71;
-}
-
-.notification.warning .notification-icon {
-    color: #f39c12;
-}
-
-.notification.error .notification-icon {
-    color: #e74c3c;
-}
-
-.notification-message {
-    font-size: 14px;
+#fileList li {
+    background-color: #e2e8f0; /* A lighter, clearer background */
     color: #333;
-}
-
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateX(100%);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-/* Sidebar */
-.sidebar {
-    width: 250px;
-    background-color: #f5f5f5;
-    color: #333333;
-    padding: 20px;
-    border-right: 1px solid #ddd;
-    display: flex;
-    flex-direction: column;
-}
-
-.sidebar-header {
-    margin-bottom: 20px;
-}
-
-.sidebar-header h2 {
-    font-size: 20px;
-    margin-bottom: 10px;
-}
-
-.new-file-btn {
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    padding: 10px;
-    border-radius: 5px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.5rem;
+    border-radius: 0.375rem; /* Rounded corners */
     cursor: pointer;
-    font-size: 14px;
-    width: 100%;
-    transition: background-color 0.3s;
+    transition: background-color 0.2s ease-in-out;
+    border: 1px solid #cbd5e0; /* Slightly darker border for definition */
 }
 
-.new-file-btn:hover {
-    background-color: #0056b3;
+#fileList li:hover {
+    background-color: #d1d5db; /* A slightly darker hover state */
 }
 
-.file-list {
-    list-style-type: none;
-    overflow-y: auto;
-    flex-grow: 1;
+#fileList li:last-child {
+    margin-bottom: 0;
 }
 
-.file-list li {
-    padding: 10px;
-    cursor: pointer;
-    border-radius: 5px;
-    margin-bottom: 5px;
-    transition: background-color 0.3s;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+/* Active File Style */
+#fileList li.active {
+    background-color: #94a3b8; /* Gray 400 equivalent in Tailwind */
+    font-weight: bold;
+    color: white; /* Ensure text is readable on the active background */
 }
 
-.file-list li:hover {
-    background-color: #e0e0e0;
-}
-
-.file-list li.active {
-    background-color: #007bff;
-    color: #fff;
-}
-
-.file-list li .file-actions {
-    display: flex;
-    gap: 5px;
-}
-
-.file-list li .file-actions button {
-    background: none;
-    border: none;
-    color: inherit;
-    cursor: pointer;
-    font-size: 12px;
-}
-
-/* Main Content */
-.main-content {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    background-color: #ffffff;
-}
-
-/* Toolbar */
-.toolbar {
+/* Quill Toolbar Styles */
+#toolbar {
+    border: 1px solid #ccc;
+    border-radius: 0.5rem; /* More rounded corners */
+    margin-bottom: 1rem;
+    padding: 0.75rem; /* Increased padding */
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
-    padding: 10px;
-    background-color: #f5f5f5;
-    border-bottom: 1px solid #ddd;
+    gap: 0.5rem; /* Slightly increased gap */
+    background-color: #f9fafb;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
 }
 
-.toolbar-btn, .toolbar-select {
-    background: none;
+#toolbar button,
+#toolbar select {
+    background-color: #fff;
     border: 1px solid #ddd;
-    color: #333333;
-    font-size: 14px;
+    border-radius: 0.375rem;
+    padding: 0.5rem 0.75rem; 
     cursor: pointer;
-    padding: 8px;
-    border-radius: 5px;
-    transition: background-color 0.3s, color 0.3s;
+    transition: background-color 0.2s ease-in-out;
+    font-size: 1.1rem; 
+    min-width: 40px;
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.toolbar-btn:hover, .toolbar-select:hover {
+#toolbar button:hover,
+#toolbar select:hover {
+    background-color: #f2f2f2;
+}
+
+#toolbar .ql-active {
+    background-color: #e5e7eb;
+}
+
+.ql-formats {
+    margin-right: 0.75rem;
+}
+
+#toolbar select {
+    appearance: none; 
+    padding-right: 2rem; 
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor' class='w-4 h-4'%3E%3Cpath fill-rule='evenodd' d='M12.53 16.28a.75.75 0 01-1.06 0l-7.5-7.5a.75.75 0 011.06-1.06L12 14.69l6.97-6.97a.75.75 0 011.06 1.06l-7.5 7.5z' clip-rule='evenodd' /%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.5rem center;
+    background-size: 1.5rem;
+}
+
+#toolbar select.ql-size,
+#toolbar select.ql-font {
+    width: auto; 
+    min-width: 80px; 
+}
+
+/* Add a class for styling the custom code button */
+.ql-code-block {
+    font-family: monospace;
+    font-size: 1em;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 0.375rem;
+    padding: 0.5rem 0.75rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.ql-code-block:hover {
     background-color: #e0e0e0;
 }
 
-.toolbar-select {
-    background-color: #ffffff;
+/* Styles for the code block display */
+.code-block-display {
+    position: relative;
+    background-color: #282c34; 
+    color: #abb2bf; 
+    border: 1px solid #61afef; 
+    border-radius: 0.375rem;
+    padding: 1rem;
+    margin: 10px 0; 
+    font-family: 'Droid Sans Mono', monospace;
+    overflow-x: auto; 
+    font-size: 0.9rem;
+    line-height: 1.4;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    display: inline-block; 
+    width: 100%; 
+    box-sizing: border-box; 
 }
 
-/* Editor */
-.editor {
-    flex-grow: 1;
-    padding: 20px;
+.code-block-display pre {
+    margin: 0;
+    padding: 0;
+    white-space: pre-wrap; 
+}
+
+.code-block-controls {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.code-block-controls button {
+    background-color: rgba(63, 81, 181, 0.7);
     border: none;
-    outline: none;
-    font-size: 16px;
-    line-height: 1.6;
-    background-color: #ffffff;
-    color: #333333;
-    overflow-y: auto;
+    border-radius: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    cursor: pointer;
+    font-size: 0.8rem;
+    color: white;
+    transition: background-color 0.3s ease;
 }
 
-.editor[placeholder]:empty::before {
-    content: attr(placeholder);
-    color: #999;
-}
-
-/* Notepad Notice */
-.notepad-notice {
-    background-color: #ffff99;
-    border: 1px solid #ffd700;
-    color: #333;
-    padding: 10px;
-    text-align: center;
-    margin-top: 10px;
-    border-radius: 5px;
-    font-weight: bold;
-    max-width: 728px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-/* Ad Banners */
-.ad-banner-top {
-    text-align: center;
-    margin: 20px auto;
-}
-
-.ad-banner-right {
-    position: fixed;
-    top: 50%;
-    right: 10px;
-    transform: translateY(-50%);
-}
-
-/* Dark Mode */
-body.dark-mode {
-    background-color: #333;
-    color: #fff;
-}
-
-body.dark-mode .sidebar {
-    background-color: #444;
-    color: #fff;
-}
-
-body.dark-mode .main-content {
-    background-color: #222;
-    color: #fff;
-}
-
-body.dark-mode .toolbar {
-    background-color: #444;
-}
-
-body.dark-mode .editor {
-    background-color: #222;
-    color: #fff;
-}
-
-body.dark-mode .notepad-notice {
-    background-color: #555;
-    border-color: #777;
-    color: #fff;
-}
-
-/* Dark Mode Notification Adjustments */
-body.dark-mode .notification {
-    background-color: #444;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-}
-
-body.dark-mode .notification-message {
-    color: #fff;
+.code-block-controls button:hover {
+    background-color: rgba(63, 81, 181, 1);
 }
