@@ -270,7 +270,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="export-option" data-export-type="json">.json</div>
                     <div class="export-option" data-export-type="latex">.tex</div>
                 </div>
-                <div class="modal-labelledby">
+                <div class="modal-buttons">
                     <button class="cancel" onclick="closeModal()">Cancel</button>
                 </div>
             </div>
@@ -323,7 +323,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let modalContent = `
                 <h2>Delete File</h2>
                 <p>Are you sure you want to delete ${currentFile}?</p>
-                <div class="modal-labelledby">
+                <div class="modal-buttons">
                     <button class="confirm" onclick="handleDeleteFile()">Delete</button>
                     <button class="cancel" onclick="closeModal()">Cancel</button>
                 </div>
@@ -435,7 +435,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let modalContent = `
             <h2>Enter Code</h2>
             <textarea id="codeContent" class="modal-input" placeholder="Enter your code here" style="height: 200px; font-family: monospace;"></textarea>
-            <div class="modal-labelledby">
+            <div class="modal-buttons">
                 <button class="confirm" onclick="handleInsertCode()">Insert</button>
                 <button class="cancel" onclick="closeModal()">Cancel</button>
             </div>
@@ -559,84 +559,6 @@ document.addEventListener('DOMContentLoaded', () => {
     window.handleOpenFile = handleOpenFile;
     window.handleExportFile = handleExportFile;
     window.handleDeleteFile = handleDeleteFile;
-
-    function handleCreateFile() {
-        const fileName = document.getElementById('newFileName').value;
-        if (fileName) {
-            currentFile = fileName;
-            files[currentFile] = {
-                ops: [{
-                    insert: '\n'
-                }]
-            }; // Initialize with empty content
-            localStorage.setItem('files', JSON.stringify(files));
-            loadFiles();
-            loadContent(currentFile);
-            modal.style.display = "none";
-        } else {
-            alert('Please enter a file name.');
-        }
-    };
-
-    function handleOpenFile() {
-        const fileName = document.getElementById('openFileName').value;
-        if (fileName && files[fileName]) {
-            currentFile = fileName;
-            loadContent(currentFile);
-            modal.style.display = "none";
-        } else {
-            showModal(`
-            <div style="text-align: center;">
-                <h2 style="color: #dc3545; margin-bottom: 1rem;">Error</h2>
-                <p style="font-size: 1.1rem; color: #333;">File not found.</p>
-                <button class="cancel" onclick="closeModal()" style="background-color: #dc3545; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 0.375rem; cursor: pointer; margin-top: 1rem; transition: background-color 0.2s ease-in-out;">OK</button>
-            </div>
-            `);
-        }
-    };
-
-    function handleExportFile(exportType) {
-        const content = quill.getText();
-
-        if (exportType === 'txt') {
-            downloadFile(currentFile + '.txt', content, 'text/plain');
-        } else if (exportType === 'md') {
-            const markdownContent = content.replace(/^# (.*$)/gim, '# $1\n').replace(/^## (.*$)/gim, '## $1\n').replace(/^### (.*$)/gim, '### $1\n').replace(/\*\*(.*)\*\*/gim, '**$1**').replace(/\*(.*)\*/gim, '*$1*');
-            downloadFile(currentFile + '.md', markdownContent, 'text/markdown');
-        } else if (exportType === 'pdf') {
-            exportToPDF(currentFile, quill.getContents());
-        } else if (exportType === 'html') {
-            const htmlContent = quill.root.innerHTML;
-            downloadFile(currentFile + '.html', htmlContent, 'text/html');
-        } else if (exportType === 'rtf') {
-            alert('RTF export not implemented yet.');
-        } else if (exportType === 'docx') {
-            alert('DOCX export not implemented yet.');
-        } else if (exportType === 'odt') {
-            alert('ODT export not implemented yet.');
-        } else if (exportType === 'epub') {
-            alert('EPUB export not implemented yet.');
-        } else if (exportType === 'json') {
-            const jsonContent = JSON.stringify(quill.getContents());
-            downloadFile(currentFile + '.json', jsonContent, 'application/json');
-        } else if (exportType === 'latex') {
-            alert('LaTeX export not implemented yet.');
-        } else {
-            alert('Invalid export type.');
-        }
-        modal.style.display = "none";
-    };
-
-    function handleDeleteFile() {
-        if (currentFile) {
-            delete files[currentFile];
-            localStorage.setItem('files', JSON.stringify(files));
-            currentFile = null;
-            quill.setContents([{
-                insert: '\n'
-            }]); // Clear editor
-            loadFiles();
-            modal.style.display = "none";
-        }
-    };
+    window.handleInsertCode = handleInsertCode;
+    window.closeModal = closeModal;
 });
