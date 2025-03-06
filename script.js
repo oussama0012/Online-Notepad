@@ -1,91 +1,93 @@
-document.addEventListener('DOMContentLoaded', () => {
-  // Initialize Quill editor
-  const quill = new Quill('#editor', {
-    theme: 'snow',
-    modules: {
-      toolbar: '#toolbar'
-    }
-  });
-
-  // File management
-  let files = {};
-  let currentFile = null;
-
-  const fileList = document.getElementById('fileList');
-  const newFileBtn = document.getElementById('newFileBtn');
-  const saveFileBtn = document.getElementById('saveFileBtn');
-  const exportFileBtn = document.getElementById('exportFileBtn');
-  const deleteFileBtn = document.getElementById('deleteFileBtn');
-  const wordCount = document.getElementById('wordCount');
-  const charCount = document.getElementById('charCount');
-
-  // Update word and character count
-  const updateCounts = () => {
-    const text = quill.getText().trim();
-    const words = text ? text.split(/\s+/).length : 0;
-    const characters = text.length;
-    wordCount.textContent = `Words: ${words}`;
-    charCount.textContent = `Characters: ${characters}`;
-  };
-
-  quill.on('text-change', updateCounts);
-
-  // Create a new file
-  newFileBtn.addEventListener('click', () => {
-    const fileName = prompt('Enter a name for the new file:');
-    if (fileName) {
-      files[fileName] = '';
-      currentFile = fileName;
-      quill.setText('');
-      updateCounts();
-      renderFileList();
-    }
-  });
-
-  // Save the current file
-  saveFileBtn.addEventListener('click', () => {
-    if (currentFile) {
-      files[currentFile] = quill.getText();
-      alert(`File "${currentFile}" saved!`);
-    } else {
-      alert('No file is currently open.');
-    }
-  });
-
-  // Delete the current file
-  deleteFileBtn.addEventListener('click', () => {
-    if (currentFile) {
-      if (confirm(`Are you sure you want to delete "${currentFile}"?`)) {
-        delete files[currentFile];
-        currentFile = null;
-        quill.setText('');
-        updateCounts();
-        renderFileList();
-      }
-    } else {
-      alert('No file is currently open.');
-    }
-  });
-
-  // Render the file list
-  const renderFileList = () => {
-    fileList.innerHTML = '';
-    for (const file in files) {
-      const li = document.createElement('li');
-      li.textContent = file;
-      li.addEventListener('click', () => {
-        currentFile = file;
-        quill.setText(files[file]);
-        updateCounts();
-        renderFileList();
-      });
-      if (file === currentFile) {
-        li.classList.add('active');
-      }
-      fileList.appendChild(li);
-    }
-  };
-
-  // Initial render
-  renderFileList();
+// File Management
+document.getElementById('upload-btn').addEventListener('click', () => {
+  document.getElementById('file-upload').click();
 });
+
+document.getElementById('file-upload').addEventListener('change', (e) => {
+  const files = e.target.files;
+  const fileList = document.getElementById('file-list');
+  fileList.innerHTML = '';
+
+  Array.from(files).forEach(file => {
+    const fileItem = document.createElement('div');
+    fileItem.textContent = file.name;
+    fileItem.addEventListener('click', () => openFile(file));
+    fileList.appendChild(fileItem);
+  });
+});
+
+function openFile(file) {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    document.getElementById('editor').innerHTML = e.target.result;
+    document.getElementById('article-content').innerHTML = e.target.result;
+  };
+  reader.readAsText(file);
+}
+
+// Text Formatting
+function formatText(command) {
+  document.execCommand(command, false, null);
+}
+
+function changeFontSize(size) {
+  document.execCommand('fontSize', false, size);
+}
+
+function alignText(align) {
+  document.execCommand('justify' + align, false, null);
+}
+
+function insertBullet() {
+  document.execCommand('insertUnorderedList', false, null);
+}
+
+function insertNumber() {
+  document.execCommand('insertOrderedList', false, null);
+}
+
+// Undo/Redo
+function undo() {
+  document.execCommand('undo', false, null);
+}
+
+function redo() {
+  document.execCommand('redo', false, null);
+}
+
+// Save and Export
+function saveNote() {
+  const content = document.getElementById('editor').innerHTML;
+  localStorage.setItem('savedNote', content);
+  alert('Note saved!');
+}
+
+function exportNote(format) {
+  const content = document.getElementById('editor').innerText;
+  const blob = new Blob([content], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `note.${format}`;
+  a.click();
+}
+
+function clearNote() {
+  document.getElementById('editor').innerHTML = '';
+  document.getElementById('article-content').innerHTML = '';
+}
+
+// Auto-save
+setInterval(() => {
+  const content = document.getElementById('editor').innerHTML;
+  localStorage.setItem('savedNote', content);
+}, 5000);
+
+// Load saved note on page load
+window.onload = () => {
+  const savedNote = localStorage.getItem('savedNote');
+  if (savedNote) {
+    document.getElementById('editor').innerHTML = savedNote;
+    document.getElementById('article-content').innerHTML = savedNote;
+  }
+};
