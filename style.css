@@ -1,0 +1,365 @@
+body {
+    font-family: 'Arial', sans-serif;
+}
+
+/* Editor Styles */
+#editor {
+    min-height: 300px;
+    font-size: 1.2rem; /* Increased font size */
+}
+
+/* Modal Styles */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1000; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+.modal-content {
+    position: relative;
+    background-color: #fefefe;
+    margin: 15% auto; /* 15% from the top and centered */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 500px;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+    animation-name: animatetop;
+    animation-duration: 0.4s;
+    border-radius: 0.5rem;
+}
+
+/* Add Animation */
+@keyframes animatetop {
+    from {top: -300px; opacity: 0}
+    to {top: 15%; opacity: 1}
+}
+
+/* The Close Button */
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.modal-input {
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 0.25rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.modal-buttons {
+    text-align: right;
+}
+
+.modal-buttons button {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    margin-left: 0.5rem;
+}
+
+.modal-buttons button.confirm {
+    background-color: #5cb85c;
+    color: white;
+}
+
+.modal-buttons button.cancel {
+    background-color: #d9534f;
+    color: white;
+}
+
+.modal-buttons button.confirm:hover {
+    background-color: #449d44; /* Darker green on hover */
+}
+
+.modal-buttons button.cancel:hover {
+    background-color: #c9302c; /* Darker red on hover */
+}
+
+/* Updated File List Styles */
+#fileList {
+    list-style: none;
+    padding: 0;
+}
+
+#fileList li {
+    background-color: #e2e8f0; /* A lighter, clearer background */
+    color: #333;
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.5rem;
+    border-radius: 0.375rem; /* Rounded corners */
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+    border: 1px solid #cbd5e0; /* Slightly darker border for definition */
+}
+
+#fileList li:hover {
+    background-color: #d1d5db; /* A slightly darker hover state */
+}
+
+#fileList li:last-child {
+    margin-bottom: 0;
+}
+
+/* Active File Style */
+#fileList li.active {
+    background-color: #94a3b8; /* Gray 400 equivalent in Tailwind */
+    font-weight: bold;
+    color: white; /* Ensure text is readable on the active background */
+}
+
+/* Updated Quill Toolbar Styles for a Modern UI */
+#toolbar {
+    border: none; /* Remove border */
+    border-radius: 0.75rem; /* More rounded corners */
+    margin-bottom: 1.5rem; /* Increased margin */
+    padding: 1rem; /* Increased padding */
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem; /* Slightly increased gap */
+    background-color: #fff; /* White background */
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1); /* Enhanced shadow for depth */
+    position: relative; /* For positioning pseudo-element */
+}
+
+#toolbar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    /* Subtle gradient */
+    z-index: -1; /* Behind the toolbar */
+}
+
+#toolbar button,
+#toolbar select {
+    background-color: #f3f4f6; /* Light gray button background */
+    border: none; /* Remove button borders */
+    border-radius: 0.5rem;
+    padding: 0.6rem 0.9rem; /* Slightly larger padding */
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
+    font-size: 1.1rem;
+    min-width: 45px;
+    min-height: 45px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #4b5563; /* Darker text color */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Subtle shadow for buttons */
+}
+
+#toolbar button:hover,
+#toolbar select:hover {
+    background-color: #e5e7eb; /* Slightly darker gray on hover */
+    transform: translateY(-1px); /* Slight lift on hover */
+}
+
+#toolbar .ql-active {
+    background-color: #d1d5db; /* Active state background */
+    color: #1f2937; /* Active state text color */
+}
+
+.ql-formats {
+    margin-right: 1rem; /* Increased margin */
+}
+
+/* Custom styling for selects */
+#toolbar select {
+    appearance: none;
+    padding-right: 2.5rem; /* Increased padding for arrow */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor' class='w-4 h-4'%3E%3Cpath fill-rule='evenodd' d='M6.28 5.22a.75.75 0 00-1.06 1.06L11.69 12l-6.47 6.47a.75.75 0 001.06 1.06L12 13.06l6.47 6.47a.75.75 0 001.06-1.06L13.06 12l6.47-6.47a.75.75 0 00-1.06-1.06L12 10.94 5.53 5.22z' clip-rule='evenodd' /%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1.5rem;
+}
+
+#toolbar select.ql-size,
+#toolbar select.ql-font {
+    width: auto;
+    min-width: 100px; /* Slightly wider */
+}
+
+/* Style for the custom code button */
+.ql-code-block {
+    font-family: monospace;
+    font-size: 1em;
+    background-color: #f3f4f6; /* Lighter gray */
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.6rem 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
+    color: #4b5563;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.ql-code-block:hover {
+    background-color: #d1d5db;
+    transform: translateY(-1px);
+}
+
+/* Styles for the code block display */
+.code-block-display {
+    position: relative;
+    background-color: #282c34;
+    color: #abb2bf;
+    border: 1px solid #61afef;
+    border-radius: 0.375rem;
+    padding: 1rem;
+    margin: 10px 0;
+    font-family: 'Droid Sans Mono', monospace;
+    overflow-x: auto;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    display: inline-block;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.code-block-display pre {
+    margin: 0;
+    padding: 0;
+    white-space: pre-wrap;
+}
+
+.code-block-controls {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.code-block-controls button {
+    background-color: rgba(63, 81, 181, 0.7);
+    border: none;
+    border-radius: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    cursor: pointer;
+    font-size: 0.8rem;
+    color: white;
+    transition: background-color 0.3s ease;
+}
+
+.code-block-controls button:hover {
+    background-color: rgba(63, 81, 181, 1);
+}
+
+#toolbar select.ql-header {
+    width: auto;
+    min-width: 80px;
+    appearance: none;
+    padding-right: 2rem;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor' class='w-4 h-4'%3E%3Cpath fill-rule='evenodd' d='M12.53 16.28a.75.75 0 01-1.06 0l-7.5-7.5a.75.75 0 011.06-1.06L12 14.69l6.97-6.97a.75.75 0 011.06 1.06l-7.5 7.5z' clip-rule='evenodd' /%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.5rem center;
+    background-size: 1.5rem;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 0.375rem;
+    padding: 0.5rem 0.75rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+    font-size: 1.1rem;
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Styling for Export Modal */
+.export-options-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); /* Responsive grid */
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.export-option {
+    background-color: #f3f4f6;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
+    color: #4b5563;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.export-option:hover {
+    background-color: #e5e7eb;
+    transform: translateY(-1px);
+}
+
+/* Add custom font classes */
+.ql-font-arial {
+    font-family: Arial, sans-serif !important;
+}
+
+.ql-font-helvetica {
+    font-family: Helvetica, sans-serif !important;
+}
+
+.ql-font-times-new-roman {
+    font-family: 'Times New Roman', Times, serif !important;
+}
+
+.ql-font-courier-new {
+    font-family: 'Courier New', Courier, monospace !important;
+}
+
+.ql-font-georgia {
+    font-family: Georgia, serif !important;
+}
+
+.ql-font-verdana {
+    font-family: Verdana, sans-serif !important;
+}
+
+.ql-font-impact {
+    font-family: Impact, sans-serif !important;
+}
+
+.ql-font-comic-sans-ms {
+    font-family: 'Comic Sans MS', cursive !important;
+}
+
+.ql-font-roboto {
+    font-family: Roboto, sans-serif !important;
+}
+
+.ql-font-montserrat {
+    font-family: Montserrat, sans-serif !important;
+}
+
+.ql-font-calibri {
+    font-family: Calibri, sans-serif !important;
+}
+
+.ql-font-segoe-ui {
+    font-family: "Segoe UI", sans-serif !important;
+}
