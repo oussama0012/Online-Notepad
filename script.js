@@ -1,24 +1,31 @@
-import { debounce } from 'lodash';
+import {
+    debounce
+} from 'lodash';
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Initialize Quill editor
     const quill = new Quill('#editor', {
         theme: 'snow',
         modules: {
             toolbar: {
                 container: '#toolbar',
-                handlers: { 'image': imageHandler }
+                handlers: {
+                    'image': imageHandler
+                }
             },
-            clipboard: true // Enable clipboard module for native copy/paste
         }
     });
 
+    // Custom Image Handler
     function imageHandler() {
         const input = document.createElement('input');
         input.setAttribute('type', 'file');
         input.setAttribute('accept', 'image/*');
         input.click();
+
         input.onchange = () => {
             const file = input.files[0];
+
             if (/^image\//.test(file.type)) {
                 saveToServer(file);
             } else {
@@ -27,13 +34,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    /**
+     * Step2. save to server
+     *
+     * @param {File} image
+     */
     function saveToServer(image) {
         const fd = new FormData();
         fd.append('image', image);
+
         const xhr = new XMLHttpRequest();
-        xhr.open('POST', 'https://api.imgbb.com/1/upload?key=YOUR_API_KEY', true);
+        xhr.open('POST', 'https://api.imgbb.com/1/upload?key=YOUR_API_KEY', true); // Change to your image upload API endpoint
         xhr.onload = () => {
             if (xhr.status === 200) {
+                // this is callback data: url
                 const url = JSON.parse(xhr.responseText).data.url;
                 insertToEditor(url);
             }
@@ -41,7 +55,13 @@ document.addEventListener('DOMContentLoaded', () => {
         xhr.send(fd);
     }
 
+    /**
+     * Step3. insert image url to rich editor.
+     *
+     * @param {string} url
+     */
     function insertToEditor(url) {
+        // push image url to rich editor.
         const range = quill.getSelection();
         quill.insertEmbed(range.index, 'image', url);
     }
@@ -53,44 +73,73 @@ document.addEventListener('DOMContentLoaded', () => {
     const newFileBtn = document.getElementById('newFileBtn');
     const openFileBtn = document.getElementById('openFileBtn');
     const saveFileBtn = document.getElementById('saveFileBtn');
-    const copyTextBtn = document.getElementById('copyTextBtn'); // New Copy Button
     const exportFileBtn = document.getElementById('exportFileBtn');
     const deleteFileBtn = document.getElementById('deleteFileBtn');
     const wordCount = document.getElementById('wordCount');
     const charCount = document.getElementById('charCount');
 
+    // Get the modal
     const modal = document.createElement('div');
     modal.id = "myModal";
     modal.classList.add("modal");
     modal.innerHTML = `
     <div class="modal-content">
-        <span class="close">×</span>
+        <span class="close">&times;</span>
         <p>Some text in the Modal..</p>
     </div>
     `;
     document.body.appendChild(modal);
 
+    // Get the <span> element that closes the modal
+    const modalSpan = document.querySelector('.close');
+
     const showModal = (content) => {
         modal.innerHTML = `
         <div class="modal-content">
-            <span class="close">×</span>
+            <span class="close">&times;</span>
             ${content}
         </div>
         `;
+        document.body.appendChild(modal);
         modal.style.display = "block";
+
+        // Get the <span> element that closes the modal
         const span = document.querySelector('.close');
-        span.onclick = function() { modal.style.display = "none"; }
-        window.onclick = function(event) { if (event.target == modal) modal.style.display = "none"; }
+        span.onclick = function() {
+            modal.style.display = "none";
+        }
+
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
     }
 
+    // When the user clicks on <span> (x), close the modal
+    modalSpan.onclick = function() {
+        modal.style.display = "none";
+    }
+
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+
+    // Function to update word and character count
     const updateWordCount = () => {
         const text = quill.getText();
         const words = text.trim().split(/\s+/).filter(Boolean).length;
         const characters = text.length;
+
         wordCount.textContent = `Words: ${words}`;
         charCount.textContent = `Characters: ${characters}`;
     };
 
+    // Autosave
     const saveContent = () => {
         if (currentFile) {
             files[currentFile] = quill.getContents();
@@ -99,12 +148,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    //Debounce saves
     const debouncedSave = debounce(saveContent, 1000);
+
     quill.on('text-change', function() {
         updateWordCount();
         debouncedSave();
     });
 
+    // File Management Functions
     const createFile = () => {
         let modalContent = `
             <h2>New File</h2>
@@ -121,7 +173,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const fileName = document.getElementById('newFileName').value;
         if (fileName) {
             currentFile = fileName;
-            files[currentFile] = { ops: [{ insert: '\n' }] };
+            files[currentFile] = {
+                ops: [{
+                    insert: '\n'
+                }]
+            }; // Initialize with empty content
             localStorage.setItem('files', JSON.stringify(files));
             loadFiles();
             loadContent(currentFile);
@@ -131,7 +187,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    window.closeModal = () => { modal.style.display = "none"; };
+    window.closeModal = () => {
+        modal.style.display = "none";
+    };
 
     const openFile = () => {
         let modalContent = `
@@ -184,41 +242,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // New Copy Function
-    const copyText = () => {
-        const text = quill.getText();
-        if (text.trim()) {
-            navigator.clipboard.writeText(text)
-                .then(() => {
-                    showModal(`
-                    <div style="text-align: center;">
-                        <h2 style="color: #28a745; margin-bottom: 1rem;">Text Copied!</h2>
-                        <p style="font-size: 1.1rem; color: #333;">The content has been copied to your clipboard.</p>
-                        <button class="confirm" onclick="closeModal()" style="background-color: #28a745; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 0.375rem; cursor: pointer; margin-top: 1rem; transition: background-color 0.2s ease-in-out;">OK</button>
-                    </div>
-                    `);
-                })
-                .catch(err => {
-                    console.error('Failed to copy text: ', err);
-                    showModal(`
-                    <div style="text-align: center;">
-                        <h2 style="color: #dc3545; margin-bottom: 1rem;">Error</h2>
-                        <p style="font-size: 1.1rem; color: #333;">Failed to copy text to clipboard.</p>
-                        <button class="cancel" onclick="closeModal()" style="background-color: #dc3545; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 0.375rem; cursor: pointer; margin-top: 1rem; transition: background-color 0.2s ease-in-out;">OK</button>
-                    </div>
-                    `);
-                });
-        } else {
-            showModal(`
-            <div style="text-align: center;">
-                <h2 style="color: #dc3545; margin-bottom: 1rem;">Error</h2>
-                <p style="font-size: 1.1rem; color: #333;">No text to copy.</p>
-                <button class="cancel" onclick="closeModal()" style="background-color: #dc3545; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 0.375rem; cursor: pointer; margin-top: 1rem; transition: background-color 0.2s ease-in-out;">OK</button>
-            </div>
-            `);
-        }
-    };
-
     const exportFile = () => {
         if (!currentFile) {
             showModal(`
@@ -230,6 +253,7 @@ document.addEventListener('DOMContentLoaded', () => {
             `);
             return;
         }
+
         let modalContent = `
             <div style="text-align: center;">
                 <h2 style="color: #3490dc; margin-bottom: 1rem;">Export File</h2>
@@ -252,6 +276,8 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         `;
         showModal(modalContent);
+
+        // Attach event listeners to export options
         document.querySelectorAll('.export-option').forEach(option => {
             option.addEventListener('click', () => {
                 const exportType = option.dataset.exportType;
@@ -262,6 +288,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.handleExportFile = (exportType) => {
         const content = quill.getText();
+
         if (exportType === 'txt') {
             downloadFile(currentFile + '.txt', content, 'text/plain');
         } else if (exportType === 'md') {
@@ -310,7 +337,9 @@ document.addEventListener('DOMContentLoaded', () => {
             delete files[currentFile];
             localStorage.setItem('files', JSON.stringify(files));
             currentFile = null;
-            quill.setContents([{ insert: '\n' }]);
+            quill.setContents([{
+                insert: '\n'
+            }]); // Clear editor
             loadFiles();
             modal.style.display = "none";
         }
@@ -328,9 +357,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const exportToPDF = (filename, content) => {
         const docDefinition = {
-            content: [{ text: filename, style: 'header' }, { text: quill.getText() }],
-            styles: { header: { fontSize: 18, bold: true } }
+            content: [{
+                text: filename,
+                style: 'header'
+            }, {
+                text: quill.getText()
+            }],
+            styles: {
+                header: {
+                    fontSize: 18,
+                    bold: true
+                }
+            }
         };
+
         pdfMake.createPdf(docDefinition).download(filename + '.pdf');
     };
 
@@ -338,9 +378,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (files[fileName]) {
             quill.setContents(files[fileName]);
             currentFile = fileName;
+
+            // Update active state in file list
             document.querySelectorAll('#fileList li').forEach(item => item.classList.remove('active'));
             const activeListItem = Array.from(fileList.children).find(item => item.textContent === fileName);
-            if (activeListItem) activeListItem.classList.add('active');
+            if (activeListItem) {
+                activeListItem.classList.add('active');
+            }
         }
         updateWordCount();
     };
@@ -352,32 +396,41 @@ document.addEventListener('DOMContentLoaded', () => {
             listItem.textContent = file;
             listItem.addEventListener('click', () => {
                 loadContent(file);
+                // Remove 'active' class from all list items
                 document.querySelectorAll('#fileList li').forEach(item => item.classList.remove('active'));
+                // Add 'active' class to the clicked list item
                 listItem.classList.add('active');
             });
             fileList.appendChild(listItem);
         }
     };
 
+    // Event Listeners
     newFileBtn.addEventListener('click', createFile);
     openFileBtn.addEventListener('click', openFile);
     saveFileBtn.addEventListener('click', saveFile);
-    copyTextBtn.addEventListener('click', copyText); // Add event listener for copy button
     exportFileBtn.addEventListener('click', exportFile);
     deleteFileBtn.addEventListener('click', deleteFile);
 
+    // Initial Load
     loadFiles();
 
+    // Function to display code block with copy and delete options
     const displayCodeBlock = (code) => {
-        const range = quill.getSelection(true);
-        quill.insertEmbed(range.index, 'code-block', { code: code }, Quill.sources.USER);
+        const range = quill.getSelection(true); // Get current selection
+
+        // Insert into Quill editor
+        quill.insertEmbed(range.index, 'code-block', {
+            code: code
+        }, Quill.sources.USER);
         quill.setSelection(range.index + 1, Quill.sources.SILENT);
     };
 
+    // Add custom code option
     const addCodeButton = document.createElement('button');
-    addCodeButton.innerHTML = '<Code>';
+    addCodeButton.innerHTML = '&lt;Code&gt;'; // Display as <Code>
     addCodeButton.title = 'Insert Code Block';
-    addCodeButton.classList.add('ql-code-block');
+    addCodeButton.classList.add('ql-code-block'); // Add a class for styling
     addCodeButton.addEventListener('click', () => {
         let modalContent = `
             <h2>Enter Code</h2>
@@ -399,39 +452,48 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     document.getElementById('toolbar').appendChild(addCodeButton);
 
+    // Define the custom blot for code-block
     class CodeBlock extends Quill.import('blots/block/embed') {
         static create(value) {
             let node = super.create();
             node.classList.add('code-block-display');
             node.setAttribute('contenteditable', 'false');
+
+            // Code content
             const codeContent = document.createElement('pre');
             codeContent.textContent = value.code;
             node.appendChild(codeContent);
+
+            // Controls container
             const controls = document.createElement('div');
             controls.classList.add('code-block-controls');
+
+            // Copy button
             const copyButton = document.createElement('button');
             copyButton.textContent = 'Copy';
             copyButton.addEventListener('click', (event) => {
                 event.stopPropagation();
-                navigator.clipboard.writeText(value.code)
-                    .then(() => {
-                        alert('Code copied to clipboard!');
-                    })
-                    .catch(err => {
-                        console.error('Failed to copy code: ', err);
-                        alert('Failed to copy code to clipboard.');
-                    });
+                navigator.clipboard.writeText(value.code).then(() => {
+                    alert('Code copied to clipboard!');
+                }).catch(err => {
+                    console.error('Failed to copy code: ', err);
+                    alert('Failed to copy code to clipboard.');
+                });
             });
             controls.appendChild(copyButton);
+
+            // Delete button
             const deleteButton = document.createElement('button');
             deleteButton.textContent = 'X';
             deleteButton.addEventListener('click', (event) => {
                 event.stopPropagation();
+                // Remove the entire code block
                 const parent = node.parentNode;
                 const index = quill.getIndex(node);
                 quill.deleteText(index, node.textContent.length + 1);
             });
             controls.appendChild(deleteButton);
+
             node.appendChild(controls);
             return node;
         }
@@ -444,41 +506,55 @@ document.addEventListener('DOMContentLoaded', () => {
     CodeBlock.blotName = 'code-block';
     CodeBlock.tagName = 'div';
     Quill.register(CodeBlock);
+
+    // Register the custom code-block embed
     Quill.register('formats/code-block', CodeBlock);
 
+    // Header selector
     const headerSelector = document.createElement('select');
     headerSelector.classList.add('ql-header');
+
+    // Add options for h1 to h6 and normal
     const normalOption = document.createElement('option');
     normalOption.value = '0';
     normalOption.textContent = 'Normal';
     headerSelector.appendChild(normalOption);
+
     for (let i = 1; i <= 6; i++) {
         const option = document.createElement('option');
         option.value = i.toString();
         option.textContent = `Header ${i}`;
         headerSelector.appendChild(option);
     }
+
     headerSelector.addEventListener('change', function() {
         const value = this.value;
         quill.format('header', value === '0' ? false : value);
     });
+
     document.getElementById('toolbar').insertBefore(headerSelector, document.querySelector('.ql-bold').parentNode);
 
+    // Font selector
     const fontSelector = document.createElement('select');
     fontSelector.classList.add('ql-font');
-    const fonts = ['Arial', 'Helvetica', 'Times New Roman', 'Courier New', 'Georgia', 'Verdana', 'Impact', 'Comic Sans MS', 'Roboto', 'Montserrat', 'Calibri', 'Segoe UI'];
+
+    // Add font options
+    const fonts = ['Arial', 'Helvetica', 'Times New Roman', 'Courier New', 'Georgia', 'Verdana', 'Impact', 'Comic Sans MS', 'Roboto', 'Montserrat', 'Calibri', 'Segoe UI']; 
     fonts.forEach(font => {
         const option = document.createElement('option');
-        option.value = font.toLowerCase().replace(/\s+/g, '-');
+        option.value = font.toLowerCase().replace(/\s+/g, '-'); 
         option.textContent = font;
         fontSelector.appendChild(option);
     });
+
     fontSelector.addEventListener('change', function() {
         const value = this.value;
         quill.format('font', value);
     });
+
     document.getElementById('toolbar').insertBefore(fontSelector, document.querySelector('.ql-size').parentNode);
 
+    // Make sure these functions are accessible globally
     window.handleCreateFile = handleCreateFile;
     window.handleOpenFile = handleOpenFile;
     window.handleExportFile = handleExportFile;
