@@ -1,96 +1,125 @@
-<!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modern Notepad</title>
-    <link rel="stylesheet" href="styles.css">
-    <!-- Font Awesome for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <!-- Google AdSense Script -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_AD_CLIENT_ID" crossorigin="anonymous"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Web Notepad</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"
+    integrity="sha512-a9NgEEK7tsCvABL7KqtyVIP9Xv0+dlX6 নীতি/lP0Mgn9xyrGa+tAO/0JjID4WnEIzodNJczEQvKtj4iRyIw=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.min.js"
+    integrity="sha512-pAoMgvsSBQ7JElWDrohvOmjk4nLCekqs4eqFv8FIyjbfWs4ooAQJBIZt3bznsn2kSSKrH6WVj3jJc3eGDHS7w=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+  <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+  <script type="importmap">
+        {
+            "imports": {
+                "lodash": "https://cdn.jsdelivr.net/npm/lodash-es@4.17.21/+esm"
+            }
+        }
+    </script>
 </head>
-<body>
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <h2>Files</h2>
-            <button id="new-file-btn" class="new-file-btn"><i class="fas fa-plus"></i> New File</button>
-        </div>
-        <ul id="file-list" class="file-list">
-            <!-- Files will be dynamically added here -->
+
+<body class="bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200">
+  <div class="container mx-auto p-4">
+
+    <!-- Main Content Area -->
+    <div class="flex">
+
+      <!-- Sidebar -->
+      <aside class="w-64 bg-gray-200 dark:bg-gray-700 p-4 rounded-l-lg">
+        <button id="newFileBtn" class="w-full bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mb-4">New</button>
+        <h2 class="text-xl font-semibold mb-2">Files</h2>
+        <ul id="fileList" class="list-none p-0">
+          <!-- File list items will be dynamically added here -->
         </ul>
-    </div>
+      </aside>
 
-    <!-- Main Content -->
-    <div class="main-content">
-        <!-- Google AdSense Banner (728x90) Above Toolbar -->
-        <div class="ad-banner-top">
-            <ins class="adsbygoogle"
-                 style="display:inline-block;width:728px;height:90px"
-                 data-ad-client="ca-pub-YOUR_AD_CLIENT_ID"
-                 data-ad-slot="YOUR_AD_SLOT_ID_TOP"></ins>
-            <script>
-                 (adsbygoogle = window.adsbygoogle || []).push({});
-            </script>
-            
-            <!-- New Notice -->
-            <div class="notepad-notice">
-                <p>⚠️ Important: Click "New File" before typing to save your work!</p>
-            </div>
-        </div>
+      <!-- Main Editor Area -->
+      <main class="flex-1 pl-4">
+        <!-- Header -->
+        <header class="flex justify-between items-center mb-4">
+          <h1 class="text-2xl font-bold">Web Notepad</h1>
+          <div class="flex items-center space-x-2">
+            <button id="openFileBtn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Open</button>
+            <button id="saveFileBtn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Save</button>
+            <button id="exportFileBtn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Export</button>
+            <button id="deleteFileBtn" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Delete</button>
+          </div>
+        </header>
 
-        <!-- Toolbar -->
-        <div class="toolbar">
-            <button id="bold-btn" class="toolbar-btn" title="Bold"><i class="fas fa-bold"></i></button>
-            <button id="italic-btn" class="toolbar-btn" title="Italic"><i class="fas fa-italic"></i></button>
-            <button id="underline-btn" class="toolbar-btn" title="Underline"><i class="fas fa-underline"></i></button>
-            <button id="strike-btn" class="toolbar-btn" title="Strikethrough"><i class="fas fa-strikethrough"></i></button>
-            <button id="list-ul-btn" class="toolbar-btn" title="Bullet List"><i class="fas fa-list-ul"></i></button>
-            <button id="list-ol-btn" class="toolbar-btn" title="Numbered List"><i class="fas fa-list-ol"></i></button>
-            <button id="link-btn" class="toolbar-btn" title="Insert Link"><i class="fas fa-link"></i></button>
-            <button id="image-btn" class="toolbar-btn" title="Insert Image"><i class="fas fa-image"></i></button>
-            <button id="align-left-btn" class="toolbar-btn" title="Align Left"><i class="fas fa-align-left"></i></button>
-            <button id="align-center-btn" class="toolbar-btn" title="Align Center"><i class="fas fa-align-center"></i></button>
-            <button id="align-right-btn" class="toolbar-btn" title="Align Right"><i class="fas fa-align-right"></i></button>
-            <button id="align-justify-btn" class="toolbar-btn" title="Justify"><i class="fas fa-align-justify"></i></button>
-            <select id="font-size" class="toolbar-select" title="Font Size">
-                <option value="1">8px</option>
-                <option value="2">10px</option>
-                <option value="3">12px</option>
-                <option value="4">14px</option>
-                <option value="5">16px</option>
-                <option value="6">18px</option>
-                <option value="7">20px</option>
+        <!-- Editor Toolbar -->
+        <div id="toolbar" class="mb-2">
+          <span class="ql-formats">
+            <button class="ql-bold" aria-label="Bold"></button>
+            <button class="ql-italic" aria-label="Italic"></button>
+            <button class="ql-underline" aria-label="Underline"></button>
+            <button class="ql-strike" aria-label="Strikethrough"></button>
+          </span>
+          <span class="ql-formats">
+            <button class="ql-header" value="1" aria-label="Header 1"></button>
+            <button class="ql-header" value="2" aria-label="Header 2"></button>
+          </span>
+          <span class="ql-formats">
+            <button class="ql-list" value="ordered" aria-label="Ordered List"></button>
+            <button class="ql-list" value="bullet" aria-label="Bullet List"></button>
+          </span>
+          <span class="ql-formats">
+            <button class="ql-indent" value="-1" aria-label="Decrease Indent"></button>
+            <button class="ql-indent" value="+1" aria-label="Increase Indent"></button>
+          </span>
+          <span class="ql-formats">
+            <select class="ql-size" aria-label="Font Size">
+              <option value="small">Small</option>
+              <option selected>Normal</option>
+              <option value="large">Large</option>
+              <option value="huge">Huge</option>
             </select>
-            <select id="font-family" class="toolbar-select" title="Font Family">
-                <option value="Arial">Arial</option>
-                <option value="Times New Roman">Times New Roman</option>
-                <option value="Courier New">Courier New</option>
-                <option value="Verdana">Verdana</option>
-                <option value="Georgia">Georgia</option>
+          </span>
+          <span class="ql-formats">
+            <select class="ql-font" aria-label="Font Family">
+              <option selected>Sans Serif</option>
+              <option value="serif">Serif</option>
+              <option value="monospace">Monospace</option>
             </select>
-            <button id="undo-btn" class="toolbar-btn" title="Undo"><i class="fas fa-undo"></i></button>
-            <button id="redo-btn" class="toolbar-btn" title="Redo"><i class="fas fa-redo"></i></button>
-            <button id="dark-mode-btn" class="toolbar-btn" title="Toggle Dark Mode"><i class="fas fa-moon"></i></button>
-            <button id="save-btn" class="toolbar-btn" title="Save File"><i class="fas fa-save"></i></button>
+          </span>
+          <span class="ql-formats">
+            <button class="ql-color" aria-label="Text Color"></button>
+            <button class="ql-background" aria-label="Background Color"></button>
+          </span>
+          <span class="ql-formats">
+            <button class="ql-align" value="left" aria-label="Align Left"></button>
+            <button class="ql-align" value="center" aria-label="Align Center"></button>
+            <button class="ql-align" value="right" aria-label="Align Right"></button>
+            <button class="ql-align" value="justify" aria-label="Justify"></button>
+          </span>
+          <span class="ql-formats">
+            <button class="ql-link" aria-label="Insert Link"></button>
+            <button class="ql-image" aria-label="Insert Image"></button>
+            <button class="ql-video" aria-label="Insert Video"></button>
+          </span>
+          <span class="ql-formats">
+            <button class="ql-clean" aria-label="Clear Formatting"></button>
+          </span>
         </div>
 
         <!-- Editor -->
-        <div id="editor" contenteditable="true" class="editor" placeholder="Start typing your note..."></div>
+        <div id="editor" class="bg-white dark:bg-gray-700 shadow-md rounded-lg p-4"></div>
+
+        <!-- Status Bar -->
+        <footer class="flex justify-between items-center mt-4">
+          <div id="wordCount" class="text-sm">Words: 0</div>
+          <div id="charCount" class="text-sm">Characters: 0</div>
+        </footer>
+      </main>
     </div>
 
-    <!-- Google AdSense Banner (120x600) on Right Side -->
-    <div class="ad-banner-right">
-        <ins class="adsbygoogle"
-             style="display:inline-block;width:120px;height:600px"
-             data-ad-client="ca-pub-YOUR_AD_CLIENT_ID"
-             data-ad-slot="YOUR_AD_SLOT_ID_RIGHT"></ins>
-        <script>
-             (adsbygoogle = window.adsbygoogle || []).push({});
-        </script>
-    </div>
+  </div>
 
-    <script src="script.js"></script>
+  <script src="script.js" type="module"></script>
 </body>
+
 </html>
