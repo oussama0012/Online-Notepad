@@ -4,59 +4,56 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Web Notepad</title>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
 </head>
-<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
-  <div class="container mx-auto p-4">
-    <div class="flex">
-      <!-- Sidebar -->
-      <aside class="w-64 bg-gray-200 dark:bg-gray-800 p-4 rounded-l-lg">
-        <button id="newFileBtn" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded mb-4">New</button>
-        <h2 class="text-xl font-semibold mb-2">Files</h2>
-        <ul id="fileList" class="space-y-2">
-          <!-- Files will be dynamically added here -->
-        </ul>
-      </aside>
+<body>
+  <div class="container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <h2>File Manager</h2>
+      <input type="file" id="file-upload" multiple style="display: none;">
+      <button id="upload-btn">Upload Files</button>
+      <div id="file-list" class="file-list"></div>
+    </div>
 
-      <!-- Main Editor Area -->
-      <main class="flex-1 pl-4">
-        <!-- Header -->
-        <header class="flex justify-between items-center mb-4">
-          <h1 class="text-2xl font-bold">Web Notepad</h1>
-          <div class="flex space-x-2">
-            <button id="saveFileBtn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">Save</button>
-            <button id="exportFileBtn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">Export</button>
-            <button id="deleteFileBtn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">Delete</button>
-          </div>
-        </header>
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <button onclick="formatText('bold')"><b>B</b></button>
+        <button onclick="formatText('italic')"><i>I</i></button>
+        <button onclick="formatText('underline')"><u>U</u></button>
+        <select onchange="changeFontSize(this.value)">
+          <option value="12">12px</option>
+          <option value="16">16px</option>
+          <option value="20">20px</option>
+          <option value="24">24px</option>
+        </select>
+        <button onclick="alignText('left')">&#x25C0;</button>
+        <button onclick="alignText('center')">&#x25AC;</button>
+        <button onclick="alignText('right')">&#x25B6;</button>
+        <button onclick="insertBullet()">&#x2022;</button>
+        <button onclick="insertNumber()">1.</button>
+        <button onclick="undo()">&#x21B6;</button>
+        <button onclick="redo()">&#x21B7;</button>
+        <button onclick="saveNote()">Save</button>
+        <button onclick="exportNote('txt')">Export as .txt</button>
+        <button onclick="clearNote()">Clear</button>
+      </div>
 
-        <!-- Editor Toolbar -->
-        <div id="toolbar" class="mb-4">
-          <button class="ql-bold">Bold</button>
-          <button class="ql-italic">Italic</button>
-          <button class="ql-underline">Underline</button>
-          <button class="ql-strike">Strike</button>
-          <select class="ql-header">
-            <option value="1">Heading 1</option>
-            <option value="2">Heading 2</option>
-            <option selected>Normal</option>
-          </select>
-        </div>
+      <!-- Notepad Section -->
+      <div class="notepad">
+        <div id="editor" contenteditable="true" spellcheck="false"></div>
+      </div>
 
-        <!-- Editor -->
-        <div id="editor" class="bg-white dark:bg-gray-700 p-4 rounded-lg shadow-md" style="min-height: 400px;"></div>
-
-        <!-- Status Bar -->
-        <footer class="flex justify-between items-center mt-4 text-sm">
-          <div id="wordCount">Words: 0</div>
-          <div id="charCount">Characters: 0</div>
-        </footer>
-      </main>
+      <!-- Article Display Section -->
+      <div class="article-display">
+        <h2>Article Preview</h2>
+        <div id="article-content"></div>
+      </div>
     </div>
   </div>
 
-  <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
