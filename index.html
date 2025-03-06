@@ -1,39 +1,21 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Web Notepad</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"
-    integrity="sha512-a9NgEEK7tsCvABL7KqtyVIP9Xv0+dlX6 নীতি/lP0Mgn9xyrGa+tAO/0JjID4WnEIzodNJczEQvKtj4iRyIw=="
-    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.min.js"
-    integrity="sha512-pAoMgvsSBQ7JElWDrohvOmjk4nLCekqs4eqFv8FIyjbfWs4ooAQJBIZt3bznsn2kSSKrH6WVj3jJc3eGDHS7w=="
-    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
   <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-  <script type="importmap">
-        {
-            "imports": {
-                "lodash": "https://cdn.jsdelivr.net/npm/lodash-es@4.17.21/+esm"
-            }
-        }
-    </script>
 </head>
-
-<body class="bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200">
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
   <div class="container mx-auto p-4">
-
-    <!-- Main Content Area -->
     <div class="flex">
-
       <!-- Sidebar -->
-      <aside class="w-64 bg-gray-200 dark:bg-gray-700 p-4 rounded-l-lg">
-        <button id="newFileBtn" class="w-full bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mb-4">New</button>
+      <aside class="w-64 bg-gray-200 dark:bg-gray-800 p-4 rounded-l-lg">
+        <button id="newFileBtn" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded mb-4">New</button>
         <h2 class="text-xl font-semibold mb-2">Files</h2>
-        <ul id="fileList" class="list-none p-0">
-          <!-- File list items will be dynamically added here -->
+        <ul id="fileList" class="space-y-2">
+          <!-- Files will be dynamically added here -->
         </ul>
       </aside>
 
@@ -42,83 +24,39 @@
         <!-- Header -->
         <header class="flex justify-between items-center mb-4">
           <h1 class="text-2xl font-bold">Web Notepad</h1>
-          <div class="flex items-center space-x-2">
-            <button id="openFileBtn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Open</button>
-            <button id="saveFileBtn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Save</button>
-            <button id="exportFileBtn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Export</button>
-            <button id="deleteFileBtn" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Delete</button>
+          <div class="flex space-x-2">
+            <button id="saveFileBtn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">Save</button>
+            <button id="exportFileBtn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">Export</button>
+            <button id="deleteFileBtn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">Delete</button>
           </div>
         </header>
 
         <!-- Editor Toolbar -->
-        <div id="toolbar" class="mb-2">
-          <span class="ql-formats">
-            <button class="ql-bold" aria-label="Bold"></button>
-            <button class="ql-italic" aria-label="Italic"></button>
-            <button class="ql-underline" aria-label="Underline"></button>
-            <button class="ql-strike" aria-label="Strikethrough"></button>
-          </span>
-          <span class="ql-formats">
-            <button class="ql-list" value="ordered" aria-label="Ordered List"></button>
-            <button class="ql-list" value="bullet" aria-label="Bullet List"></button>
-          </span>
-          <span class="ql-formats">
-            <button class="ql-indent" value="-1" aria-label="Decrease Indent"></button>
-            <button class="ql-indent" value="+1" aria-label="Increase Indent"></button>
-          </span>
-          <span class="ql-formats">
-            <select class="ql-size" aria-label="Font Size">
-              <option value="small">Small</option>
-              <option selected>Normal</option>
-              <option value="large">Large</option>
-              <option value="huge">Huge</option>
-            </select>
-          </span>
-          <span class="ql-formats">
-            <select class="ql-font" aria-label="Font Family">
-              <option selected>Sans Serif</option>
-              <option value="serif">Serif</option>
-              <option value="monospace">Monospace</option>
-            </select>
-          </span>
-          <span class="ql-formats">
-            <button class="ql-color" aria-label="Text Color"></button>
-            <button class="ql-background" aria-label="Background Color"></button>
-          </span>
-          <span class="ql-formats">
-            <button class="ql-align" value="left" aria-label="Align Left"></button>
-            <button class="ql-align" value="center" aria-label="Align Center"></button>
-            <button class="ql-align" value="right" aria-label="Align Right"></button>
-            <button class="ql-align" value="justify" aria-label="Justify"></button>
-          </span>
-          <span class="ql-formats">
-            <button class="ql-link" aria-label="Insert Link"></button>
-            <button class="ql-image" aria-label="Insert Image"></button>
-            <button class="ql-video" aria-label="Insert Video"></button>
-          </span>
-          <span class="ql-formats">
-            <button class="ql-clean" aria-label="Clear Formatting"></button>
-          </span>
-        </div>
-
-        <!-- Article Section -->
-        <div id="articleSection" class="bg-white dark:bg-gray-700 shadow-md rounded-lg p-4 mb-4">
-          <h2 class="text-xl font-semibold mb-2">Article Title</h2>
-          <p class="text-gray-700 dark:text-gray-300">This is a sample article content. You can add more text here.</p>
+        <div id="toolbar" class="mb-4">
+          <button class="ql-bold">Bold</button>
+          <button class="ql-italic">Italic</button>
+          <button class="ql-underline">Underline</button>
+          <button class="ql-strike">Strike</button>
+          <select class="ql-header">
+            <option value="1">Heading 1</option>
+            <option value="2">Heading 2</option>
+            <option selected>Normal</option>
+          </select>
         </div>
 
         <!-- Editor -->
-        <div id="editor" class="bg-white dark:bg-gray-700 shadow-md rounded-lg p-4"></div>
+        <div id="editor" class="bg-white dark:bg-gray-700 p-4 rounded-lg shadow-md" style="min-height: 400px;"></div>
 
         <!-- Status Bar -->
-        <footer class="flex justify-between items-center mt-4">
-          <div id="wordCount" class="text-sm">Words: 0</div>
-          <div id="charCount" class="text-sm">Characters: 0</div>
+        <footer class="flex justify-between items-center mt-4 text-sm">
+          <div id="wordCount">Words: 0</div>
+          <div id="charCount">Characters: 0</div>
         </footer>
       </main>
     </div>
   </div>
 
-  <script src="script.js" type="module"></script>
+  <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
