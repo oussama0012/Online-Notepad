@@ -5,26 +5,26 @@ body {
 /* Editor Styles */
 #editor {
     min-height: 300px;
-    font-size: 1.2rem; /* Increased font size */
+    font-size: 1.2rem;
 }
 
 /* Modal Styles */
 .modal {
-    display: none; /* Hidden by default */
-    position: fixed; /* Stay in place */
-    z-index: 1000; /* Sit on top */
+    display: none;
+    position: fixed;
+    z-index: 1000;
     left: 0;
     top: 0;
-    width: 100%; /* Full width */
-    height: 100%; /* Full height */
-    overflow: auto; /* Enable scroll if needed */
-    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
 }
 
 .modal-content {
     position: relative;
     background-color: #fefefe;
-    margin: 15% auto; /* 15% from the top and centered */
+    margin: 15% auto;
     padding: 20px;
     border: 1px solid #888;
     width: 80%;
@@ -35,13 +35,11 @@ body {
     border-radius: 0.5rem;
 }
 
-/* Add Animation */
 @keyframes animatetop {
     from {top: -300px; opacity: 0}
     to {top: 15%; opacity: 1}
 }
 
-/* The Close Button */
 .close {
     color: #aaa;
     float: right;
@@ -88,57 +86,58 @@ body {
 }
 
 .modal-buttons button.confirm:hover {
-    background-color: #449d44; /* Darker green on hover */
+    background-color: #449d44;
 }
 
 .modal-buttons button.cancel:hover {
-    background-color: #c9302c; /* Darker red on hover */
+    background-color: #c9302c;
 }
 
-/* Updated File List Styles */
+/* Updated File List Styles with Scrollbar */
 #fileList {
     list-style: none;
     padding: 0;
+    max-height: 400px; /* Set a maximum height */
+    overflow-y: auto; /* Enable vertical scrolling when content overflows */
 }
 
 #fileList li {
-    background-color: #e2e8f0; /* A lighter, clearer background */
+    background-color: #e2e8f0;
     color: #333;
     padding: 0.75rem 1rem;
     margin-bottom: 0.5rem;
-    border-radius: 0.375rem; /* Rounded corners */
+    border-radius: 0.375rem;
     cursor: pointer;
     transition: background-color 0.2s ease-in-out;
-    border: 1px solid #cbd5e0; /* Slightly darker border for definition */
+    border: 1px solid #cbd5e0;
 }
 
 #fileList li:hover {
-    background-color: #d1d5db; /* A slightly darker hover state */
+    background-color: #d1d5db;
 }
 
 #fileList li:last-child {
     margin-bottom: 0;
 }
 
-/* Active File Style */
 #fileList li.active {
-    background-color: #94a3b8; /* Gray 400 equivalent in Tailwind */
+    background-color: #94a3b8;
     font-weight: bold;
-    color: white; /* Ensure text is readable on the active background */
+    color: white;
 }
 
 /* Updated Quill Toolbar Styles for a Modern UI */
 #toolbar {
-    border: none; /* Remove border */
-    border-radius: 0.75rem; /* More rounded corners */
-    margin-bottom: 1.5rem; /* Increased margin */
-    padding: 1rem; /* Increased padding */
+    border: none;
+    border-radius: 0.75rem;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
     display: flex;
     flex-wrap: wrap;
-    gap: 0.75rem; /* Slightly increased gap */
-    background-color: #fff; /* White background */
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1); /* Enhanced shadow for depth */
-    position: relative; /* For positioning pseudo-element */
+    gap: 0.75rem;
+    background-color: #fff;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    position: relative;
 }
 
 #toolbar::before {
@@ -149,16 +148,15 @@ body {
     width: 100%;
     height: 100%;
     border-radius: inherit;
-    /* Subtle gradient */
-    z-index: -1; /* Behind the toolbar */
+    z-index: -1;
 }
 
 #toolbar button,
 #toolbar select {
-    background-color: #f3f4f6; /* Light gray button background */
-    border: none; /* Remove button borders */
+    background-color: #f3f4f6;
+    border: none;
     border-radius: 0.5rem;
-    padding: 0.6rem 0.9rem; /* Slightly larger padding */
+    padding: 0.6rem 0.9rem;
     cursor: pointer;
     transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
     font-size: 1.1rem;
@@ -167,29 +165,28 @@ body {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    color: #4b5563; /* Darker text color */
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Subtle shadow for buttons */
+    color: #4b5563;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 #toolbar button:hover,
 #toolbar select:hover {
-    background-color: #e5e7eb; /* Slightly darker gray on hover */
-    transform: translateY(-1px); /* Slight lift on hover */
+    background-color: #e5e7eb;
+    transform: translateY(-1px);
 }
 
 #toolbar .ql-active {
-    background-color: #d1d5db; /* Active state background */
-    color: #1f2937; /* Active state text color */
+    background-color: #d1d5db;
+    color: #1f2937;
 }
 
 .ql-formats {
-    margin-right: 1rem; /* Increased margin */
+    margin-right: 1rem;
 }
 
-/* Custom styling for selects */
 #toolbar select {
     appearance: none;
-    padding-right: 2.5rem; /* Increased padding for arrow */
+    padding-right: 2.5rem;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor' class='w-4 h-4'%3E%3Cpath fill-rule='evenodd' d='M6.28 5.22a.75.75 0 00-1.06 1.06L11.69 12l-6.47 6.47a.75.75 0 001.06 1.06L12 13.06l6.47 6.47a.75.75 0 001.06-1.06L13.06 12l6.47-6.47a.75.75 0 00-1.06-1.06L12 10.94 5.53 5.22z' clip-rule='evenodd' /%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 0.75rem center;
@@ -199,14 +196,14 @@ body {
 #toolbar select.ql-size,
 #toolbar select.ql-font {
     width: auto;
-    min-width: 100px; /* Slightly wider */
+    min-width: 100px;
 }
 
-/* Style for the custom code button */
+/* Custom styling for code button */
 .ql-code-block {
     font-family: monospace;
     font-size: 1em;
-    background-color: #f3f4f6; /* Lighter gray */
+    background-color: #f3f4f6;
     border: none;
     border-radius: 0.5rem;
     padding: 0.6rem 0.9rem;
@@ -294,7 +291,7 @@ body {
 /* Styling for Export Modal */
 .export-options-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); /* Responsive grid */
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     gap: 0.75rem;
     margin-bottom: 1.5rem;
 }
@@ -316,50 +313,11 @@ body {
 }
 
 /* Add custom font classes */
-.ql-font-arial {
-    font-family: Arial, sans-serif !important;
-}
-
-.ql-font-helvetica {
-    font-family: Helvetica, sans-serif !important;
-}
-
-.ql-font-times-new-roman {
-    font-family: 'Times New Roman', Times, serif !important;
-}
-
-.ql-font-courier-new {
-    font-family: 'Courier New', Courier, monospace !important;
-}
-
-.ql-font-georgia {
-    font-family: Georgia, serif !important;
-}
-
-.ql-font-verdana {
-    font-family: Verdana, sans-serif !important;
-}
-
-.ql-font-impact {
-    font-family: Impact, sans-serif !important;
-}
-
-.ql-font-comic-sans-ms {
-    font-family: 'Comic Sans MS', cursive !important;
-}
-
-.ql-font-roboto {
-    font-family: Roboto, sans-serif !important;
-}
-
-.ql-font-montserrat {
-    font-family: Montserrat, sans-serif !important;
-}
-
-.ql-font-calibri {
-    font-family: Calibri, sans-serif !important;
-}
-
-.ql-font-segoe-ui {
-    font-family: "Segoe UI", sans-serif !important;
-}
+.ql-font-arial { font-family: Arial, sans-serif !important; }
+.ql-font-helvetica { font-family: Helvetica, sans-serif !important; }
+.ql-font-times-new-roman { font-family: 'Times New Roman', Times, serif !important; }
+.ql-font-courier-new { font-family: 'Courier New', Courier, monospace !important; }
+.ql-font-georgia { font-family: Georgia, serif !important; }
+.ql-font-verdana { font-family: Verdana, sans-serif !important; }
+.ql-font-impact { font-family: Impact, sans-serif !important; }
+.ql-font-comic-sans-m
