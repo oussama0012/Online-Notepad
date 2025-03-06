@@ -1,125 +1,54 @@
+<!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Web Notepad</title>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"
-    integrity="sha512-a9NgEEK7tsCvABL7KqtyVIP9Xv0+dlX6 নীতি/lP0Mgn9xyrGa+tAO/0JjID4WnEIzodNJczEQvKtj4iRyIw=="
-    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.min.js"
-    integrity="sha512-pAoMgvsSBQ7JElWDrohvOmjk4nLCekqs4eqFv8FIyjbfWs4ooAQJBIZt3bznsn2kSSKrH6WVj3jJc3eGDHS7w=="
-    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
-  <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-  <script type="importmap">
-        {
-            "imports": {
-                "lodash": "https://cdn.jsdelivr.net/npm/lodash-es@4.17.21/+esm"
-            }
-        }
-    </script>
+  <title>Modern Web Notepad</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
-
-<body class="bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200">
-  <div class="container mx-auto p-4">
-
-    <!-- Main Content Area -->
-    <div class="flex">
-
-      <!-- Sidebar -->
-      <aside class="w-64 bg-gray-200 dark:bg-gray-700 p-4 rounded-l-lg">
-        <button id="newFileBtn" class="w-full bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mb-4">New</button>
-        <h2 class="text-xl font-semibold mb-2">Files</h2>
-        <ul id="fileList" class="list-none p-0">
-          <!-- File list items will be dynamically added here -->
-        </ul>
-      </aside>
-
-      <!-- Main Editor Area -->
-      <main class="flex-1 pl-4">
-        <!-- Header -->
-        <header class="flex justify-between items-center mb-4">
-          <h1 class="text-2xl font-bold">Web Notepad</h1>
-          <div class="flex items-center space-x-2">
-            <button id="openFileBtn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Open</button>
-            <button id="saveFileBtn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Save</button>
-            <button id="exportFileBtn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Export</button>
-            <button id="deleteFileBtn" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Delete</button>
-          </div>
-        </header>
-
-        <!-- Editor Toolbar -->
-        <div id="toolbar" class="mb-2">
-          <span class="ql-formats">
-            <button class="ql-bold" aria-label="Bold"></button>
-            <button class="ql-italic" aria-label="Italic"></button>
-            <button class="ql-underline" aria-label="Underline"></button>
-            <button class="ql-strike" aria-label="Strikethrough"></button>
-          </span>
-          <span class="ql-formats">
-            <button class="ql-header" value="1" aria-label="Header 1"></button>
-            <button class="ql-header" value="2" aria-label="Header 2"></button>
-          </span>
-          <span class="ql-formats">
-            <button class="ql-list" value="ordered" aria-label="Ordered List"></button>
-            <button class="ql-list" value="bullet" aria-label="Bullet List"></button>
-          </span>
-          <span class="ql-formats">
-            <button class="ql-indent" value="-1" aria-label="Decrease Indent"></button>
-            <button class="ql-indent" value="+1" aria-label="Increase Indent"></button>
-          </span>
-          <span class="ql-formats">
-            <select class="ql-size" aria-label="Font Size">
-              <option value="small">Small</option>
-              <option selected>Normal</option>
-              <option value="large">Large</option>
-              <option value="huge">Huge</option>
-            </select>
-          </span>
-          <span class="ql-formats">
-            <select class="ql-font" aria-label="Font Family">
-              <option selected>Sans Serif</option>
-              <option value="serif">Serif</option>
-              <option value="monospace">Monospace</option>
-            </select>
-          </span>
-          <span class="ql-formats">
-            <button class="ql-color" aria-label="Text Color"></button>
-            <button class="ql-background" aria-label="Background Color"></button>
-          </span>
-          <span class="ql-formats">
-            <button class="ql-align" value="left" aria-label="Align Left"></button>
-            <button class="ql-align" value="center" aria-label="Align Center"></button>
-            <button class="ql-align" value="right" aria-label="Align Right"></button>
-            <button class="ql-align" value="justify" aria-label="Justify"></button>
-          </span>
-          <span class="ql-formats">
-            <button class="ql-link" aria-label="Insert Link"></button>
-            <button class="ql-image" aria-label="Insert Image"></button>
-            <button class="ql-video" aria-label="Insert Video"></button>
-          </span>
-          <span class="ql-formats">
-            <button class="ql-clean" aria-label="Clear Formatting"></button>
-          </span>
-        </div>
-
-        <!-- Editor -->
-        <div id="editor" class="bg-white dark:bg-gray-700 shadow-md rounded-lg p-4"></div>
-
-        <!-- Status Bar -->
-        <footer class="flex justify-between items-center mt-4">
-          <div id="wordCount" class="text-sm">Words: 0</div>
-          <div id="charCount" class="text-sm">Characters: 0</div>
-        </footer>
-      </main>
+<body>
+  <div class="container">
+    <!-- Left Sidebar -->
+    <div class="sidebar left-sidebar">
+      <div class="file-actions">
+        <button id="new-file">New File</button>
+        <button id="new-folder">New Folder</button>
+      </div>
+      <ul id="file-list">
+        <!-- Files and folders will be dynamically added here -->
+      </ul>
     </div>
 
+    <!-- Main Editor Area -->
+    <div class="main-content">
+      <div class="toolbar">
+        <button id="bold">B</button>
+        <button id="italic">I</button>
+        <button id="underline">U</button>
+        <button id="save">Save</button>
+        <button id="export">Export</button>
+      </div>
+      <textarea id="editor" placeholder="Start typing..."></textarea>
+    </div>
+
+    <!-- Right Sidebar (AdSense) -->
+    <div class="sidebar right-sidebar">
+      <div class="ad">
+        <!-- Google AdSense Placeholder -->
+        <p>Ad Space</p>
+      </div>
+    </div>
+
+    <!-- Status Bar -->
+    <div class="status-bar">
+      <span id="word-count">Words: 0</span>
+      <span id="char-count">Chars: 0</span>
+      <span id="line-number">Lines: 1</span>
+      <span id="file-type">File Type: TXT</span>
+      <span id="cursor-position">Cursor: 1:1</span>
+    </div>
   </div>
 
-  <script src="script.js" type="module"></script>
+  <script src="script.js"></script>
 </body>
-
 </html>
