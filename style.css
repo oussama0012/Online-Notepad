@@ -1,116 +1,250 @@
-/* General Styles */
 body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 0;
-  background-color: #f4f4f4;
-  color: #333;
+    font-family: 'Arial', sans-serif;
 }
 
-.container {
-  display: flex;
-  height: 100vh;
-}
-
-/* Sidebar */
-.sidebar {
-  width: 250px;
-  background-color: #2c3e50;
-  color: #fff;
-  padding: 20px;
-}
-
-.sidebar h2 {
-  margin-top: 0;
-}
-
-#upload-btn {
-  background-color: #3498db;
-  color: #fff;
-  border: none;
-  padding: 10px;
-  width: 100%;
-  cursor: pointer;
-  margin-bottom: 20px;
-}
-
-.file-list {
-  max-height: 80vh;
-  overflow-y: auto;
-}
-
-.file-list div {
-  padding: 10px;
-  background-color: #34495e;
-  margin-bottom: 5px;
-  cursor: pointer;
-}
-
-/* Main Content */
-.main-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  padding: 20px;
-}
-
-/* Toolbar */
-.toolbar {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.toolbar button, .toolbar select {
-  padding: 10px;
-  border: none;
-  background-color: #3498db;
-  color: #fff;
-  cursor: pointer;
-}
-
-.toolbar button:hover, .toolbar select:hover {
-  background-color: #2980b9;
-}
-
-/* Notepad */
-.notepad {
-  flex: 1;
-  background-color: #fff;
-  border: 1px solid #ddd;
-  padding: 20px;
-  margin-bottom: 20px;
-}
-
+/* Editor */
 #editor {
-  width: 100%;
-  height: 100%;
-  outline: none;
+    min-height: 300px;
+    background-color: white;
+    dark: bg-gray-700 shadow-md rounded-lg p-4;
+    overflow-y: auto; 
+    max-height: 500px; 
+}
+#article {
+    margin-top: 20px;
 }
 
-/* Article Display */
-.article-display {
-  background-color: #fff;
-  border: 1px solid #ddd;
-  padding: 20px;
+/* Modal Styles */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1000; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
 }
 
-#article-content {
-  margin-top: 10px;
+.modal-content {
+    position: relative;
+    background-color: #fefefe;
+    margin: 15% auto; /* 15% from the top and centered */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 500px;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+    animation-name: animatetop;
+    animation-duration: 0.4s;
+    border-radius: 0.5rem;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-  .container {
-    flex-direction: column;
-  }
+/* Add Animation */
+@keyframes animatetop {
+    from {top: -300px; opacity: 0}
+    to {top: 15%; opacity: 1}
+}
 
-  .sidebar {
+/* The Close Button */
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.modal-input {
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 0.25rem;
     width: 100%;
-    height: auto;
-  }
+    box-sizing: border-box;
+}
 
-  .main-content {
-    padding: 10px;
-  }
+.modal-buttons {
+    text-align: right;
+}
+
+.modal-buttons button {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    margin-left: 0.5rem;
+}
+
+.modal-buttons button.confirm {
+    background-color: #5cb85c;
+    color: white;
+}
+
+.modal-buttons button.cancel {
+    background-color: #d9534f;
+    color: white;
+}
+
+/* Updated File List Styles */
+#fileList {
+    list-style: none;
+    padding: 0;
+}
+
+#fileList li {
+    background-color: #e2e8f0; /* A lighter, clearer background */
+    color: #333;
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.5rem;
+    border-radius: 0.375rem; /* Rounded corners */
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+    border: 1px solid #cbd5e0; /* Slightly darker border for definition */
+}
+
+#fileList li:hover {
+    background-color: #d1d5db; /* A slightly darker hover state */
+}
+
+#fileList li:last-child {
+    margin-bottom: 0;
+}
+
+/* Active File Style */
+#fileList li.active {
+    background-color: #94a3b8; /* Gray 400 equivalent in Tailwind */
+    font-weight: bold;
+    color: white; /* Ensure text is readable on the active background */
+}
+
+/* Quill Toolbar Styles */
+#toolbar {
+    border: none;
+    border-radius: 0.75rem;
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    background-color: #f3f4f6;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+#toolbar button,
+#toolbar select {
+    background-color: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    padding: 0.6rem 0.8rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+    font-size: 1rem;
+    min-width: 36px;
+    min-height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #4b5563;
+    width: 40px;
+    height: 40px;
+}
+
+#toolbar button:hover,
+#toolbar select:hover {
+    background-color: #edf2f7;
+    border-color: #cbd5e0;
+}
+
+#toolbar .ql-active {
+    background-color: #d1d5db;
+    color: #1f2937;
+}
+
+.ql-formats {
+    margin-right: 0.5rem;
+}
+
+#toolbar select {
+    appearance: none;
+    padding-right: 2rem;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor' class='w-4 h-4'%3E%3Cpath fill-rule='evenodd' d='M12.53 16.28a.75.75 0 01-1.06 0l-7.5-7.5a.75.75 0 011.06-1.06L12 14.69l6.97-6.97a.75.75 0 011.06 1.06l-7.5 7.5z' clip-rule='evenodd' /%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.5rem center;
+    background-size: 1.25rem;
+}
+
+#toolbar select.ql-size,
+#toolbar select.ql-font {
+    width: auto;
+    min-width: 90px;
+}
+
+/* SVG Icon Styling (optional, for more consistent sizing) */
+#toolbar button svg {
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+/* Dark Mode adjustments */
+body.dark #toolbar {
+    background-color: #4a5568;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+body.dark #toolbar button,
+body.dark #toolbar select {
+    background-color: #6b7280;
+    border-color: #4a5568;
+    color: #d1d5db;
+}
+
+body.dark #toolbar button:hover,
+body.dark #toolbar select:hover {
+    background-color: #4a5568;
+    border-color: #6b7280;
+}
+
+body.dark #toolbar .ql-active {
+    background-color: #374151;
+    color: #f9fafb;
+}
+
+/* Styles for the Export Modal */
+.export-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.export-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+}
+
+.export-option:hover {
+    background-color: #f9fafb;
+    border-color: #cbd5e0;
+}
+
+.export-option svg {
+    width: 2rem;
+    height: 2rem;
+    margin-bottom: 0.5rem;
 }
