@@ -75,6 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const saveFileBtn = document.getElementById('saveFileBtn');
     const exportFileBtn = document.getElementById('exportFileBtn');
     const deleteFileBtn = document.getElementById('deleteFileBtn');
+    const renameFileBtn = document.getElementById('renameFileBtn');
     const wordCount = document.getElementById('wordCount');
     const charCount = document.getElementById('charCount');
 
@@ -211,13 +212,58 @@ document.addEventListener('DOMContentLoaded', () => {
             modal.style.display = "none";
         } else {
             let modalContent = `
-                <h2>Error</h2>
-                <p>File not found.</p>
-                <div class="modal-buttons">
-                    <button class="confirm" onclick="closeModal()">OK</button>
+                <div class="flex flex-col items-center justify-center p-6">
+                    <svg class="w-12 h-12 text-red-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                    </svg>
+                    <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">Warning</h2>
+                    <p class="text-gray-600 dark:text-gray-300 mb-4">File not found.</p>
+                    <button class="confirm bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="closeModal()">OK</button>
                 </div>
             `;
             showModal(modalContent);
+        }
+    };
+
+    const renameFile = () => {
+        if (currentFile) {
+            let modalContent = `
+                <h2>Rename File</h2>
+                <input type="text" id="newFileName" class="modal-input" placeholder="Enter new file name" value="${currentFile}" />
+                <div class="modal-buttons">
+                    <button class="confirm" onclick="handleRenameFile()">Rename</button>
+                    <button class="cancel" onclick="closeModal()">Cancel</button>
+                </div>
+            `;
+            showModal(modalContent);
+        } else {
+            let modalContent = `
+                <div class="flex flex-col items-center justify-center p-6">
+                    <svg class="w-12 h-12 text-red-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                    </svg>
+                    <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">Warning</h2>
+                    <p class="text-gray-600 dark:text-gray-300 mb-4">No file selected to rename.</p>
+                    <button class="confirm bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="closeModal()">OK</button>
+                </div>
+            `;
+            showModal(modalContent);
+        }
+    };
+
+    window.handleRenameFile = () => {
+        const newFileName = document.getElementById('newFileName').value;
+        if (newFileName && newFileName !== currentFile) {
+            // Rename file logic
+            files[newFileName] = files[currentFile];
+            delete files[currentFile];
+            localStorage.setItem('files', JSON.stringify(files));
+            currentFile = newFileName;
+            loadFiles();
+            loadContent(currentFile);
+            modal.style.display = "none";
+        } else {
+            alert('Please enter a different file name.');
         }
     };
 
@@ -453,6 +499,7 @@ document.addEventListener('DOMContentLoaded', () => {
     saveFileBtn.addEventListener('click', saveFile);
     exportFileBtn.addEventListener('click', exportFile);
     deleteFileBtn.addEventListener('click', deleteFile);
+    renameFileBtn.addEventListener('click', renameFile);
 
     // Initial Load
     loadFiles();
