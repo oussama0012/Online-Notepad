@@ -5,22 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Online Notepad</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"
-    integrity="sha512-a9NgEEK7tsCvABL7KqtyVIP9Xv0+dlX6 নীতি/lP0Mgn9xyrGa+tAO/0JjID4WnEIzodNJczEQvKtj4iRyIw=="
-    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.min.js"
-    integrity="sha512-pAoMgvsSBQ7JElWDrohvOmjk4nLCekqs4eqFv8FIyjbfWs4ooAQJBIZt3bznsn2kSSKrH6WVj3jJc3eGDHS7w=="
-    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
   <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Open+Sans:wght@400;700&family=Lato:wght@400;700&family=Montserrat:wght@400;700&family=Poppins:wght@400;700&family=Raleway:wght@400;700&family=Merriweather:wght@400;700&family=Nunito:wght@400;700&family=Playfair+Display:wght@400;700&family=Oswald:wght@400;700&family=Source+Sans+Pro:wght@400;700&family=Ubuntu:wght@400;700&family=PT+Sans:wght@400;700&family=Inter:wght@400;700&family=Quicksand:wght@400;700&family=Rubik:wght@400;700&family=Work+Sans:wght@400;700&family=Karla:wght@400;700&family=Josefin+Sans:wght@400;700&family=Comfortaa:wght@400;700&family=Bitter:wght@400;700&family=Crimson+Text:wght@400;700&family=Libre+Baskerville:wght@400;700&family=Source+Serif+Pro:wght@400;700&family=Inconsolata:wght@400;700&family=Fira+Code:wght@400;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <script type="importmap">
-        {
-            "imports": {
-                "lodash": "https://cdn.jsdelivr.net/npm/lodash-es@4.17.21/+esm"
-            }
-        }
-    </script>
+    {
+      "imports": {
+        "lodash": "https://cdn.jsdelivr.net/npm/lodash-es@4.17.21/+esm"
+      }
+    }
+  </script>
 </head>
 
 <body class="bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200">
@@ -66,25 +62,51 @@
           <!-- Editor Toolbar -->
           <div id="toolbar" class="mb-2">
             <span class="ql-formats">
-              <button class="ql-bold" aria-label="Bold"></button>
-              <button class="ql-italic" aria-label="Italic"></button>
-              <button class="ql-underline" aria-label="Underline"></button>
-              <button class="ql-strike" aria-label="Strikethrough"></button>
+              <select class="ql-header" title="Heading">
+                <option value="1">Heading 1</option>
+                <option value="2">Heading 2</option>
+                <option value="3">Heading 3</option>
+                <option value="">Normal</option>
+              </select>
             </span>
             <span class="ql-formats">
-              <button class="ql-header" value="1" aria-label="Header 1"></button>
-              <button class="ql-header" value="2" aria-label="Header 2"></button>
-            </span>
-            <span class="ql-formats">
-              <button class="ql-list" value="ordered" aria-label="Ordered List"></button>
-              <button class="ql-list" value="bullet" aria-label="Bullet List"></button>
-            </span>
-            <span class="ql-formats">
-              <button class="ql-indent" value="-1" aria-label="Decrease Indent"></button>
-              <button class="ql-indent" value="+1" aria-label="Increase Indent"></button>
-            </span>
-            <span class="ql-formats">
-              <select class="ql-size" aria-label="Font Size">
+              <select class="ql-font" title="Font">
+                <option value="arial" selected>Arial</option>
+                <option value="helvetica">Helvetica</option>
+                <option value="times-new-roman">Times New Roman</option>
+                <option value="garamond">Garamond</option>
+                <option value="georgia">Georgia</option>
+                <option value="courier-new">Courier New</option>
+                <option value="verdana">Verdana</option>
+                <option value="roboto">Roboto</option>
+                <option value="open-sans">Open Sans</option>
+                <option value="lato">Lato</option>
+                <option value="montserrat">Montserrat</option>
+                <option value="poppins">Poppins</option>
+                <option value="raleway">Raleway</option>
+                <option value="merriweather">Merriweather</option>
+                <option value="nunito">Nunito</option>
+                <option value="playfair-display">Playfair Display</option>
+                <option value="oswald">Oswald</option>
+                <option value="source-sans-pro">Source Sans Pro</option>
+                <option value="ubuntu">Ubuntu</option>
+                <option value="pt-sans">PT Sans</option>
+                <option value="inter">Inter</option>
+                <option value="quicksand">Quicksand</option>
+                <option value="rubik">Rubik</option>
+                <option value="work-sans">Work Sans</option>
+                <option value="karla">Karla</option>
+                <option value="josefin-sans">Josefin Sans</option>
+                <option value="comfortaa">Comfortaa</option>
+                <option value="bitter">Bitter</option>
+                <option value="crimson-text">Crimson Text</option>
+                <option value="libre-baskerville">Libre Baskerville</option>
+                <option value="source-serif-pro">Source Serif Pro</option>
+                <option value="inconsolata">Inconsolata</option>
+                <option value="fira-code">Fira Code</option>
+                <option value="space-mono">Space Mono</option>
+              </select>
+              <select class="ql-size" title="Size">
                 <option value="small">Small</option>
                 <option selected>Normal</option>
                 <option value="large">Large</option>
@@ -92,29 +114,34 @@
               </select>
             </span>
             <span class="ql-formats">
-              <select class="ql-font" aria-label="Font Family">
-                <option selected>Sans Serif</option>
-                <option value="serif">Serif</option>
-                <option value="monospace">Monospace</option>
-              </select>
+              <button class="ql-bold" title="Bold"></button>
+              <button class="ql-italic" title="Italic"></button>
+              <button class="ql-underline" title="Underline"></button>
+              <button class="ql-strike" title="Strikethrough"></button>
             </span>
             <span class="ql-formats">
-              <button class="ql-color" aria-label="Text Color"></button>
-              <button class="ql-background" aria-label="Background Color"></button>
+              <select class="ql-color" title="Text Color"></select>
+              <select class="ql-background" title="Background Color"></select>
             </span>
             <span class="ql-formats">
-              <button class="ql-align" value="left" aria-label="Align Left"></button>
-              <button class="ql-align" value="center" aria-label="Align Center"></button>
-              <button class="ql-align" value="right" aria-label="Align Right"></button>
-              <button class="ql-align" value="justify" aria-label="Justify"></button>
+              <button class="ql-list" value="ordered" title="Numbered List"></button>
+              <button class="ql-list" value="bullet" title="Bullet List"></button>
+              <button class="ql-indent" value="-1" title="Decrease Indent"></button>
+              <button class="ql-indent" value="+1" title="Increase Indent"></button>
             </span>
             <span class="ql-formats">
-              <button class="ql-link" aria-label="Insert Link"></button>
-              <button class="ql-image" aria-label="Insert Image"></button>
-              <button class="ql-video" aria-label="Insert Video"></button>
+              <select class="ql-align" title="Text Alignment"></select>
+              <button class="ql-direction" value="rtl" title="Text Direction"></button>
             </span>
             <span class="ql-formats">
-              <button class="ql-clean" aria-label="Clear Formatting"></button>
+              <button class="ql-link" title="Insert Link"></button>
+              <button class="ql-image" title="Insert Image"></button>
+              <button class="ql-video" title="Insert Video"></button>
+            </span>
+            <span class="ql-formats">
+              <button class="ql-formula" title="Insert Formula"></button>
+              <button class="ql-code-block" title="Code Block"></button>
+              <button class="ql-clean" title="Clear Formatting"></button>
             </span>
           </div>
  
