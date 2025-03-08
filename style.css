@@ -1,123 +1,55 @@
 body {
-    font-family: 'Arial', sans-serif;
-    font-size: 16px; /* Base font size increase */
+    font-family: 'Inter', sans-serif; /* More modern base font */
+    background: linear-gradient(135deg, #f6f8f9 0%, #e5ebee 100%); /* Soft gradient background */
+    min-height: 100vh;
+    color: #2c3e50; /* Deep blue-gray for better readability */
+    font-size: 16px; 
 }
 
-/* Editor */
-#editor {
-    min-height: 300px;
-    background-color: white;
-    dark: bg-gray-700 shadow-md rounded-lg p-4;
-    overflow-y: auto; 
-    max-height: 500px; 
-    font-size: 1.1rem; /* Increased editor font size */
-}
-#article {
-    margin-top: 20px;
+.container {
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    margin-top: 2rem;
+    transition: all 0.3s ease;
 }
 
-/* Modal Styles */
-.modal {
-    display: none; /* Hidden by default */
-    position: fixed; /* Stay in place */
-    z-index: 1000; /* Sit on top */
-    left: 0;
-    top: 0;
-    width: 100%; /* Full width */
-    height: 100%; /* Full height */
-    overflow: auto; /* Enable scroll if needed */
-    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+.container:hover {
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    transform: translateY(-5px);
 }
 
-.modal-content {
-    position: relative;
-    background-color: #fefefe;
-    margin: 15% auto; /* 15% from the top and centered */
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%;
-    max-width: 500px;
-    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
-    animation-name: animatetop;
-    animation-duration: 0.4s;
-    border-radius: 0.5rem;
-    font-size: 1.1rem; /* Increased modal font size */
+/* Sidebar Enhancements */
+aside {
+    background: linear-gradient(145deg, #f0f4f8 0%, #e6edf3 100%);
+    border-radius: 12px;
+    box-shadow: 
+        inset -5px -5px 10px rgba(255, 255, 255, 0.8),
+        inset 5px 5px 10px rgba(191, 201, 212, 0.3);
 }
 
-/* Add Animation */
-@keyframes animatetop {
-    from {top: -300px; opacity: 0}
-    to {top: 15%; opacity: 1}
-}
-
-/* The Close Button */
-.close {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-}
-
-.close:hover,
-.close:focus {
-    color: black;
-    text-decoration: none;
-    cursor: pointer;
-}
-
-.modal-input {
-    margin-bottom: 1rem;
-    padding: 0.5rem;
-    border: 1px solid #ccc;
-    border-radius: 0.25rem;
-    width: 100%;
-    box-sizing: border-box;
-    font-size: 1.1rem; /* Increased input font size */
-}
-
-.modal-buttons {
-    text-align: right;
-}
-
-.modal-buttons button {
-    padding: 0.5rem 1rem;
-    border: none;
-    border-radius: 0.25rem;
-    cursor: pointer;
-    margin-left: 0.5rem;
-    font-size: 1.1rem; /* Increased button font size */
-}
-
-.modal-buttons button.confirm {
-    background-color: #5cb85c;
-    color: white;
-}
-
-.modal-buttons button.cancel {
-    background-color: #d9534f;
-    color: white;
-}
-
-/* Updated File List Styles */
 #fileList {
     list-style: none;
     padding: 0;
 }
 
 #fileList li {
-    background-color: #e2e8f0; /* A lighter, clearer background */
-    color: #333;
+    transition: all 0.3s ease;
+    background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
+    border: 1px solid rgba(203, 213, 224, 0.3);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
     padding: 0.75rem 1rem;
     margin-bottom: 0.5rem;
-    border-radius: 0.375rem; /* Rounded corners */
+    border-radius: 0.375rem; 
     cursor: pointer;
-    transition: background-color 0.2s ease-in-out;
-    border: 1px solid #cbd5e0; /* Slightly darker border for definition */
-    font-size: 1.05rem; /* Increased file list font size */
+    font-size: 1.05rem; 
 }
 
 #fileList li:hover {
-    background-color: #d1d5db; /* A slightly darker hover state */
+    transform: scale(1.02);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
 }
 
 #fileList li:last-child {
@@ -126,50 +58,48 @@ body {
 
 /* Active File Style */
 #fileList li.active {
-    background-color: #94a3b8; /* Gray 400 equivalent in Tailwind */
+    background-color: #94a3b8; 
     font-weight: bold;
-    color: white; /* Ensure text is readable on the active background */
+    color: white; 
 }
 
-/* Updated Modern Toolbar Styles */
+/* Toolbar Beautification */
 #toolbar {
+    background: linear-gradient(145deg, #f9fafb 0%, #f3f4f6 100%);
+    border-radius: 12px;
+    box-shadow: 
+        -5px -5px 10px rgba(255, 255, 255, 0.8),
+        5px 5px 10px rgba(191, 201, 212, 0.3);
+    padding: 1rem;
+    margin-bottom: 1rem;
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
-    background-color: #f8fafc;
-    border-radius: 0.75rem;
-    padding: 0.75rem;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    transition: all 0.3s ease;
 }
 
 #toolbar .ql-formats {
-    display: flex;
-    align-items: center;
-    background-color: rgba(255, 255, 255, 0.7);
-    border-radius: 0.5rem;
-    padding: 0.25rem;
-    margin-right: 0.25rem;
-    border: 1px solid #e2e8f0;
-    transition: all 0.2s ease;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 8px;
+    margin-right: 0.5rem;
+    transition: all 0.3s ease;
 }
 
 #toolbar button,
 #toolbar select {
+    color: #4a5568;
+    border-radius: 6px;
+    transition: all 0.3s ease;
     background-color: transparent;
     border: none;
-    border-radius: 0.375rem;
     padding: 0.35rem;
     margin: 0 0.1rem;
     cursor: pointer;
-    transition: all 0.2s ease;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    color: #4a5568;
-    width: 2.25rem; /* Increased button size */
-    height: 2.25rem; /* Increased button size */
-    font-size: 1.1rem; /* Increased font size */
+    width: 2.25rem; 
+    height: 2.25rem; 
+    font-size: 1.1rem; 
 }
 
 #toolbar button:hover,
@@ -204,6 +134,303 @@ body {
 #toolbar .ql-picker-label svg {
     width: 1.25rem;
     height: 1.25rem;
+}
+
+/* Editor Styling */
+#editor {
+    background: linear-gradient(to right, #ffffff 0%, #f9fafb 100%);
+    border-radius: 12px;
+    box-shadow: 
+        0 10px 25px rgba(0, 0, 0, 0.05),
+        inset 0 2px 5px rgba(0, 0, 0, 0.05);
+    min-height: 400px;
+    transition: all 0.3s ease;
+    max-height: 500px; 
+    overflow-y: auto; 
+    font-size: 1.1rem; 
+}
+
+#editor:hover {
+    box-shadow: 
+        0 15px 35px rgba(0, 0, 0, 0.1),
+        inset 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+/* Button Styling */
+button {
+    transition: all 0.3s ease;
+    border-radius: 8px;
+    background: linear-gradient(145deg, #4a90e2, #357abf);
+    color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Status Bar */
+footer {
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 8px;
+    padding: 0.5rem;
+    margin-top: 1rem;
+}
+
+/* Scrollbar for Font Family */
+.ql-snow .ql-picker.ql-font .ql-picker-options {
+    max-height: 250px;
+    overflow-y: auto;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.ql-snow .ql-picker.ql-font .ql-picker-options::-webkit-scrollbar {
+    width: 8px;
+}
+
+.ql-snow .ql-picker.ql-font .ql-picker-options::-webkit-scrollbar-track {
+    background: #f1f3f5;
+    border-radius: 4px;
+}
+
+.ql-snow .ql-picker.ql-font .ql-picker-options::-webkit-scrollbar-thumb {
+    background: #4a90e2;
+    border-radius: 4px;
+}
+
+/* Modal Improvements */
+.modal {
+    display: none; 
+    position: fixed; 
+    z-index: 1000; 
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    overflow: auto; 
+    background-color: rgba(0,0,0,0.4); 
+}
+
+.modal-content {
+    background: linear-gradient(145deg, #ffffff 0%, #f1f5f9 100%);
+    border-radius: 16px;
+    box-shadow: 
+        0 25px 50px -12px rgba(0, 0, 0, 0.25),
+        0 10px 20px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    max-width: 500px;
+    width: 90%;
+    margin: 10vh auto;
+    position: relative;
+    overflow: hidden;
+    font-size: 1.1rem; 
+}
+
+.modal-content::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at center, rgba(74, 144, 226, 0.1) 0%, transparent 70%);
+    z-index: -1;
+}
+
+/* The Close Button */
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.modal-input {
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 0.25rem;
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 1.1rem; 
+}
+
+.modal-buttons {
+    text-align: right;
+}
+
+.modal-buttons button {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    margin-left: 0.5rem;
+    font-size: 1.1rem; 
+}
+
+.modal-buttons button.confirm {
+    background-color: #5cb85c;
+    color: white;
+}
+
+.modal-buttons button.cancel {
+    background-color: #d9534f;
+    color: white;
+}
+
+/* Link and Formula Modal Styles */
+.link-modal, .formula-modal {
+    padding: 1.5rem;
+}
+
+.modal-title {
+    font-size: 1.75rem; 
+    font-weight: 600;
+    color: #4b5563;
+    margin-bottom: 1.25rem;
+    text-align: center;
+}
+
+.link-form {
+    margin-bottom: 1.5rem;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    font-size: 1.05rem; 
+    font-weight: 500;
+    color: #4b5563;
+    margin-bottom: 0.5rem;
+}
+
+.form-group .modal-input {
+    display: block;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    background-color: white;
+    font-size: 1.1rem; 
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-group .modal-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+}
+
+.modal-buttons button {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 0.375rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.modal-buttons button.confirm {
+    background-color: #3b82f6;
+    color: white;
+}
+
+.modal-buttons button.confirm:hover {
+    background-color: #2563eb;
+}
+
+.modal-buttons button.cancel {
+    background-color: #f3f4f6;
+    color: #4b5563;
+}
+
+.modal-buttons button.cancel:hover {
+    background-color: #e5e7eb;
+}
+
+/* Dark mode adjustments */
+body.dark #toolbar {
+    background-color: #2d3748;
+    box-shadow: 0 4px 6px -1px rgba(255, 255, 255, 0.1), 0 2px 4px -1px rgba(255, 255, 255, 0.06);
+}
+
+body.dark #toolbar .ql-formats {
+    background-color: rgba(45, 55, 72, 0.7);
+    border-color: #4a5568;
+}
+
+body.dark #toolbar button,
+body.dark #toolbar select {
+    color: #e2e8f0;
+}
+
+body.dark #toolbar button:hover,
+body.dark #toolbar select:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Dark mode adjustments for scrollbar */
+body.dark .ql-snow .ql-picker.ql-font .ql-picker-options::-webkit-scrollbar-track {
+    background: #2d3748;
+}
+
+body.dark .ql-snow .ql-picker.ql-font .ql-picker-options::-webkit-scrollbar-thumb {
+    background: #4a5568;
+}
+
+body.dark .ql-snow .ql-picker.ql-font .ql-picker-options::-webkit-scrollbar-thumb:hover {
+    background: #718096;
+}
+
+/* Font family dropdown scrollbar styling */
+.ql-snow .ql-picker.ql-font .ql-picker-options {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.ql-snow .ql-picker.ql-font .ql-picker-options::-webkit-scrollbar {
+    width: 6px;
+}
+
+.ql-snow .ql-picker.ql-font .ql-picker-options::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.ql-snow .ql-picker.ql-font .ql-picker-options::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 3px;
+}
+
+.ql-snow .ql-picker.ql-font .ql-picker-options::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+        margin-top: 0;
+    }
 }
 
 /* Fullscreen Button */
@@ -259,207 +486,6 @@ body.dark .editor-fullscreen {
 .editor-fullscreen #editor {
     flex-grow: 1;
     max-height: none;
-}
-
-/* Font family dropdown scrollbar styling */
-.ql-snow .ql-picker.ql-font .ql-picker-options {
-    max-height: 200px;
-    overflow-y: auto;
-}
-
-.ql-snow .ql-picker.ql-font .ql-picker-options::-webkit-scrollbar {
-    width: 6px;
-}
-
-.ql-snow .ql-picker.ql-font .ql-picker-options::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 3px;
-}
-
-.ql-snow .ql-picker.ql-font .ql-picker-options::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 3px;
-}
-
-.ql-snow .ql-picker.ql-font .ql-picker-options::-webkit-scrollbar-thumb:hover {
-    background: #555;
-}
-
-/* Dark mode adjustments for scrollbar */
-body.dark .ql-snow .ql-picker.ql-font .ql-picker-options::-webkit-scrollbar-track {
-    background: #2d3748;
-}
-
-body.dark .ql-snow .ql-picker.ql-font .ql-picker-options::-webkit-scrollbar-thumb {
-    background: #4a5568;
-}
-
-body.dark .ql-snow .ql-picker.ql-font .ql-picker-options::-webkit-scrollbar-thumb:hover {
-    background: #718096;
-}
-
-/* Dark Mode Adjustments */
-body.dark #toolbar {
-    background-color: #2d3748;
-    box-shadow: 0 4px 6px -1px rgba(255, 255, 255, 0.1), 0 2px 4px -1px rgba(255, 255, 255, 0.06);
-}
-
-body.dark #toolbar .ql-formats {
-    background-color: rgba(45, 55, 72, 0.7);
-    border-color: #4a5568;
-}
-
-body.dark #toolbar button,
-body.dark #toolbar select {
-    color: #e2e8f0;
-}
-
-body.dark #toolbar button:hover,
-body.dark #toolbar select:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-}
-
-/* Styles for the Export Modal */
-.export-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-    gap: 1rem;
-    margin-bottom: 1rem;
-}
-
-.export-option {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 1rem;
-    border: 1px solid #e2e8f0;
-    border-radius: 0.5rem;
-    text-align: center;
-    cursor: pointer;
-    transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
-}
-
-.export-option:hover {
-    background-color: #f9fafb;
-    border-color: #cbd5e0;
-}
-
-.export-option svg {
-    width: 2rem;
-    height: 2rem;
-    margin-bottom: 0.5rem;
-}
-
-/* Link and Formula Modal Styles */
-.link-modal, .formula-modal {
-    padding: 1.5rem;
-}
-
-.modal-title {
-    font-size: 1.75rem; /* Increased modal title size */
-    font-weight: 600;
-    color: #4b5563;
-    margin-bottom: 1.25rem;
-    text-align: center;
-}
-
-.link-form {
-    margin-bottom: 1.5rem;
-}
-
-.form-group {
-    margin-bottom: 1rem;
-}
-
-.form-group label {
-    display: block;
-    font-size: 1.05rem; /* Increased form label size */
-    font-weight: 500;
-    color: #4b5563;
-    margin-bottom: 0.5rem;
-}
-
-.form-group .modal-input {
-    display: block;
-    width: 100%;
-    padding: 0.75rem 1rem;
-    border: 1px solid #d1d5db;
-    border-radius: 0.375rem;
-    background-color: white;
-    font-size: 1.1rem; /* Increased form input size */
-    transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.form-group .modal-input:focus {
-    outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
-}
-
-.modal-buttons {
-    display: flex;
-    justify-content: flex-end;
-    gap: 0.75rem;
-}
-
-.modal-buttons button {
-    padding: 0.75rem 1.5rem;
-    border: none;
-    border-radius: 0.375rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.modal-buttons button.confirm {
-    background-color: #3b82f6;
-    color: white;
-}
-
-.modal-buttons button.confirm:hover {
-    background-color: #2563eb;
-}
-
-.modal-buttons button.cancel {
-    background-color: #f3f4f6;
-    color: #4b5563;
-}
-
-.modal-buttons button.cancel:hover {
-    background-color: #e5e7eb;
-}
-
-/* Dark mode adjustments */
-body.dark .modal-title {
-    color: #e5e7eb;
-}
-
-body.dark .form-group label {
-    color: #d1d5db;
-}
-
-body.dark .form-group .modal-input {
-    background-color: #1f2937;
-    border-color: #4b5563;
-    color: #e5e7eb;
-}
-
-body.dark .form-group .modal-input:focus {
-    border-color: #60a5fa;
-    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.3);
-}
-
-body.dark .modal-buttons button.cancel {
-    background-color: #374151;
-    color: #d1d5db;
-}
-
-body.dark .modal-buttons button.cancel:hover {
-    background-color: #4b5563;
-}
-#wordCount, #charCount {
-    font-size: 1rem; /* Increased status bar font size */
 }
 
 /* Font family classes for Quill */
@@ -769,4 +795,78 @@ body.dark .modal-buttons button.cancel:hover {
 }
 .ql-font-space-mono {
     font-family: 'Space Mono', monospace;
+}
+
+#article {
+    margin-top: 20px;
+}
+
+#wordCount, #charCount {
+    font-size: 1rem; 
+}
+
+/* Export Modal Icon Styles */
+.export-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    padding: 1rem;
+}
+
+.export-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    border-radius: 12px;
+    background: linear-gradient(145deg, #f0f4f8 0%, #e6edf3 100%);
+    box-shadow: 
+        5px 5px 10px rgba(191, 201, 212, 0.3),
+        -5px -5px 10px rgba(255, 255, 255, 0.8);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-align: center;
+    font-weight: 600;
+    color: #4a5568;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 0.9rem;
+}
+
+.export-option:hover {
+    transform: scale(1.05);
+    box-shadow: 
+        7px 7px 14px rgba(191, 201, 212, 0.4),
+        -7px -7px 14px rgba(255, 255, 255, 0.9);
+    background: linear-gradient(145deg, #f8fafc 0%, #e2e8f0 100%);
+}
+
+.export-option svg {
+    width: 4rem;  
+    height: 4rem; 
+    margin-bottom: 1rem;
+    color: #4a90e2; 
+    transition: transform 0.3s ease;
+}
+
+.export-option:hover svg {
+    transform: scale(1.1);
+}
+
+/* Dark mode adjustments for export modal */
+body.dark .export-option {
+    background: linear-gradient(145deg, #2d3748 0%, #1a202c 100%);
+    box-shadow: 
+        5px 5px 10px rgba(0, 0, 0, 0.5),
+        -5px -5px 10px rgba(45, 55, 72, 0.5);
+    color: #e2e8f0;
+}
+
+body.dark .export-option:hover {
+    background: linear-gradient(145deg, #374151 0%, #1f2937 100%);
+}
+
+body.dark .export-option svg {
+    color: #63b3ed; 
 }
