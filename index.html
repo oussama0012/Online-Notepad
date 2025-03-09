@@ -1,247 +1,173 @@
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Online Notepad</title>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Open+Sans:wght@400;700&family=Lato:wght@400;700&family=Montserrat:wght@400;700&family=Poppins:wght@400;700&family=Raleway:wght@400;700&family=Merriweather:wght@400;700&family=Nunito:wght@400;700&family=Playfair+Display:wght@400;700&family=Oswald:wght@400;700&family=Source+Sans+Pro:wght@400;700&family=Ubuntu:wght@400;700&family=PT+Sans:wght@400;700&family=Inter:wght@400;700&family=Quicksand:wght@400;700&family=Rubik:wght@400;700&family=Work+Sans:wght@400;700&family=Karla:wght@400;700&family=Josefin+Sans:wght@400;700&family=Comfortaa:wght@400;700&family=Bitter:wght@400;700&family=Crimson+Text:wght@400;700&family=Libre+Baskerville:wght@400;700&family=Source+Serif+Pro:wght@400;700&family=Inconsolata:wght@400;700&family=Fira+Code:wght@400;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-  <script type="importmap">
-    {
-      "imports": {
-        "lodash": "https://cdn.jsdelivr.net/npm/lodash-es@4.17.21/+esm"
-      }
-    }
-  </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Notepad - Free Web-Based Text Editor</title>
+    <meta name="description" content="A free, professional online notepad that works in your browser. Create, edit, save and export text notes easily. No installation required.">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.snow.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.5.0-beta4/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://unpkg.com/docx@7.8.2/build/index.js"></script>
 </head>
-
-<body class="bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200">
-  <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex flex-col md:flex-row">
-      <!-- Sidebar -->
-      <aside class="w-full md:w-64 bg-gray-200 dark:bg-gray-700 p-4 rounded-lg mb-4 md:mr-4 md:mb-0">
-        <button id="newFileBtn" class="w-full bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mb-4">New</button>
-        <h2 class="text-xl font-semibold mb-2">Files</h2>
-        <ul id="fileList" class="list-none p-0 max-h-96 overflow-y-auto">
-          <!-- File list items will be dynamically added here -->
-        </ul>
-      </aside>
-      
-      <div class="flex-1 w-full">
-        <!-- Main Editor Area -->
-        <main class="w-full">
-          <!-- Header -->
-          <header class="flex flex-wrap justify-between items-center mb-4 space-y-2 md:space-y-0">
-            <h1 class="text-2xl font-bold w-full md:w-auto">Online Notepad</h1>
-            <div class="flex flex-wrap items-center space-x-2">
-              <button id="openFileBtn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-2 md:mb-0">Open</button>
-              <button id="saveFileBtn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-2 md:mb-0">Save</button>
-              <button id="exportFileBtn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-2 md:mb-0">Export</button>
-              <button id="deleteFileBtn" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mb-2 md:mb-0">Delete</button>
-              <button id="renameFileBtn" class="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded">Rename</button>
+<body>
+    <div class="app-container">
+        <!-- File Management Panel (Left Sidebar) -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <button id="new-file-btn" class="btn primary-btn">
+                    <i class="fas fa-plus"></i> New File
+                </button>
             </div>
-          </header>
- 
-          <!-- AdSense Ad Slot -->
-          <div id="adsense-container" class="mb-2 flex justify-center overflow-x-auto">
-            <ins class="adsbygoogle"
-              style="display:inline-block;max-width:100%;width:728px;height:90px"
-              data-ad-client="ca-pub-xxxxxxxxxxxxx"
-              data-ad-slot="yyyyyyyyyyyyyy"></ins>
-            <script>
-              (adsbygoogle = window.adsbygoogle || []).push({});
-            </script>
-          </div>
-          <!-- Editor Toolbar -->
-          <div id="toolbar" class="mb-2 overflow-x-auto">
-            <span class="ql-formats">
-              <select class="ql-header" title="Heading">
-                <option value="1">Heading 1</option>
-                <option value="2">Heading 2</option>
-                <option value="3">Heading 3</option>
-                <option value="">Normal</option>
-              </select>
-            </span>
-            <span class="ql-formats">
-              <select class="ql-font" title="Font">
-                <option value="arial" selected>Arial</option>
-                <option value="helvetica">Helvetica</option>
-                <option value="times-new-roman">Times New Roman</option>
-                <option value="garamond">Garamond</option>
-                <option value="georgia">Georgia</option>
-                <option value="courier-new">Courier New</option>
-                <option value="verdana">Verdana</option>
-                <option value="roboto">Roboto</option>
-                <option value="open-sans">Open Sans</option>
-                <option value="lato">Lato</option>
-                <option value="montserrat">Montserrat</option>
-                <option value="poppins">Poppins</option>
-                <option value="raleway">Raleway</option>
-                <option value="merriweather">Merriweather</option>
-                <option value="nunito">Nunito</option>
-                <option value="playfair-display">Playfair Display</option>
-                <option value="oswald">Oswald</option>
-                <option value="source-sans-pro">Source Sans Pro</option>
-                <option value="ubuntu">Ubuntu</option>
-                <option value="pt-sans">PT Sans</option>
-                <option value="inter">Inter</option>
-                <option value="quicksand">Quicksand</option>
-                <option value="rubik">Rubik</option>
-                <option value="work-sans">Work Sans</option>
-                <option value="karla">Karla</option>
-                <option value="josefin-sans">Josefin Sans</option>
-                <option value="comfortaa">Comfortaa</option>
-                <option value="bitter">Bitter</option>
-                <option value="crimson-text">Crimson Text</option>
-                <option value="libre-baskerville">Libre Baskerville</option>
-                <option value="source-serif-pro">Source Serif Pro</option>
-                <option value="inconsolata">Inconsolata</option>
-                <option value="fira-code">Fira Code</option>
-                <option value="space-mono">Space Mono</option>
-              </select>
-              <select class="ql-size" title="Size">
-                <option value="small">Small</option>
-                <option selected>Normal</option>
-                <option value="large">Large</option>
-                <option value="huge">Huge</option>
-              </select>
-            </span>
-            <span class="ql-formats">
-              <button class="ql-bold" title="Bold"></button>
-              <button class="ql-italic" title="Italic"></button>
-              <button class="ql-underline" title="Underline"></button>
-              <button class="ql-strike" title="Strikethrough"></button>
-            </span>
-            <span class="ql-formats">
-              <select class="ql-color" title="Text Color"></select>
-              <select class="ql-background" title="Background Color"></select>
-            </span>
-            <span class="ql-formats">
-              <button class="ql-list" value="ordered" title="Numbered List"></button>
-              <button class="ql-list" value="bullet" title="Bullet List"></button>
-              <button class="ql-indent" value="-1" title="Decrease Indent"></button>
-              <button class="ql-indent" value="+1" title="Increase Indent"></button>
-            </span>
-            <span class="ql-formats">
-              <select class="ql-align" title="Text Alignment"></select>
-              <button class="ql-direction" value="rtl" title="Text Direction"></button>
-            </span>
-          </div>
- 
-          <!-- Editor -->
-          <div id="editor" class="bg-white dark:bg-gray-700 shadow-md rounded-lg p-4 mb-4 min-h-[300px]"></div>
-
-          <!-- Status Bar / Footer -->
-          <footer class="flex flex-wrap justify-between items-center mt-4 mb-4">
-            <div id="wordCount" class="text-sm w-full md:w-auto mb-2 md:mb-0">Words: 0</div>
-            <div id="charCount" class="text-sm w-full md:w-auto">Characters: 0</div>
-          </footer>
-
-          <!-- Article Section -->
-          <div class="flex justify-center w-full">
-            <article class="w-full max-w-4xl bg-white dark:bg-gray-700 shadow-md rounded-lg p-4 mb-4">
-              <header class="mb-6">
-                <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-200 mb-4">Powerful Online Notepad: Your Ultimate Digital Writing Companion</h1>
-              </header>
-              
-              <div class="prose max-w-none dark:prose-invert">
-                <h2 class="text-2xl font-semibold mb-3">Introducing Your Advanced Online Notepad</h2>
-                <p>This isn't just another online notepad. It's a robust writing tool designed to make your writing process smoother, more efficient, and more enjoyable.</p>
-
-                <h2 class="text-2xl font-semibold mb-3 mt-6">Key Features That Set Us Apart</h2>
-                <ul class="list-disc pl-6 space-y-2">
-                  <li><strong>Extensive Font Library:</strong> Choose from over 30 professional fonts, from classic Times New Roman to modern Inter</li>
-                  <li><strong>Rich Text Formatting:</strong> Complete control with headers, font sizes, colors, and text styles</li>
-                  <li><strong>Automatic Saving:</strong> Never lose your work with built-in autosave functionality</li>
-                  <li><strong>Multiple File Management:</strong> Create, open, save, rename, and delete files seamlessly</li>
-                  <li><strong>Export Flexibility:</strong> Export to TXT, MD, HTML, JSON, PDF, and DOCX formats</li>
-                  <li><strong>Advanced Text Editing:</strong> Support for lists, indentation, text alignment, and direction</li>
-                  <li><strong>Image and Formula Embedding:</strong> Insert images and mathematical formulas with ease</li>
+            <div class="file-list-container">
+                <h3>My Files</h3>
+                <ul id="file-list" class="file-list">
+                    <!-- Files will be listed here dynamically -->
                 </ul>
+            </div>
+        </div>
 
-                <h2 class="text-2xl font-semibold mb-3 mt-6">File Management Made Simple</h2>
-                <p>Our notepad offers an intuitive sidebar for managing your documents. Create new files, open existing ones, and organize your writing with just a few clicks. Each file is automatically saved in your browser's local storage.</p>
-
-                <h2 class="text-2xl font-semibold mb-3 mt-6">Powerful Export Options</h2>
-                <p>Whether you're a student, professional, or writer, our export feature supports multiple formats. Quickly convert your document to PDF for reports, DOCX for collaboration, or TXT for simple text needs.</p>
-
-                <h2 class="text-2xl font-semibold mb-3 mt-6">Writing Analytics</h2>
-                <p>Track your writing progress with real-time word and character count. Stay informed about the length and scope of your document as you write.</p>
-
-                <h2 class="text-2xl font-semibold mb-3 mt-6">Seamless User Experience</h2>
-                <p>Designed with user comfort in mind, the interface is clean, responsive, and intuitive. Whether you're writing a quick note or a lengthy document, our tool adapts to your needs.</p>
-
-                <h2 class="text-2xl font-semibold mb-3 mt-6">Completely Browser-Based</h2>
-                <p>No downloads, no installations. Start writing immediately in your web browser. Your files are saved locally, ensuring privacy and quick access.</p>
-
-                <h2 class="text-2xl font-semibold mb-3 mt-6">Frequently Asked Questions</h2>
-                <div class="bg-gray-50 dark:bg-gray-600 p-6 rounded-lg space-y-4">
-                  <div>
-                    <h3 class="font-semibold mb-2">Is my data safe?</h3>
-                    <p>Yes. All files are saved in your browser's local storage. No cloud uploads unless you choose to export.</p>
-                  </div>
-                  <div>
-                    <h3 class="font-semibold mb-2">Can I use it on mobile?</h3>
-                    <p>Absolutely! The responsive design works seamlessly on smartphones and tablets.</p>
-                  </div>
-                  <div>
-                    <h3 class="font-semibold mb-2">Are there any costs?</h3>
-                    <p>This online notepad is completely free to use with full features.</p>
-                  </div>
-                  <div>
-                    <h3 class="font-semibold mb-2">What browsers support this tool?</h3>
-                    <p>Works on all modern browsers: Chrome, Firefox, Safari, Edge, and Opera.</p>
-                  </div>
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <!-- Title Section -->
+            <div class="header">
+                <div class="title">Online Notepad</div>
+                
+                <!-- Toolbar -->
+                <div class="toolbar">
+                    <div class="btn-group">
+                        <button id="open-file-btn" class="btn">
+                            <i class="fas fa-folder-open"></i> Open File
+                        </button>
+                        <button id="save-file-btn" class="btn primary-btn">
+                            <i class="fas fa-save"></i> Save
+                        </button>
+                    </div>
+                    <div class="btn-group">
+                        <div class="dropdown">
+                            <button id="export-file-btn" class="btn">
+                                <i class="fas fa-file-export"></i> Export
+                            </button>
+                            <div class="dropdown-content">
+                                <a href="#" id="export-txt"><i class="fas fa-file-alt"></i> Text File (.txt)</a>
+                                <a href="#" id="export-pdf"><i class="fas fa-file-pdf"></i> PDF File (.pdf)</a>
+                                <a href="#" id="export-docx"><i class="fas fa-file-word"></i> Word File (.docx)</a>
+                            </div>
+                        </div>
+                        <button id="rename-file-btn" class="btn">
+                            <i class="fas fa-edit"></i> Rename
+                        </button>
+                    </div>
+                    <div class="btn-group">
+                        <button id="delete-file-btn" class="btn danger-btn">
+                            <i class="fas fa-trash-alt"></i> Delete
+                        </button>
+                        <button id="fullscreen-btn" class="btn">
+                            <i class="fas fa-expand"></i> Fullscreen
+                        </button>
+                    </div>
                 </div>
+            </div>
 
-                <h2 class="text-2xl font-semibold mb-3 mt-6">Perfect for Everyone</h2>
-                <div class="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <h3 class="font-semibold">Students</h3>
-                    <ul class="list-disc pl-6">
-                      <li>Class notes</li>
-                      <li>Essay drafting</li>
-                      <li>Research organization</li>
-                    </ul>
-                  </div>
-                  <div>
-                    <h3 class="font-semibold">Professionals</h3>
-                    <ul class="list-disc pl-6">
-                      <li>Meeting minutes</li>
-                      <li>Project planning</li>
-                      <li>Report writing</li>
-                    </ul>
-                  </div>
-                  <div>
-                    <h3 class="font-semibold">Writers</h3>
-                    <ul class="list-disc pl-6">
-                      <li>Book drafting</li>
-                      <li>Blog post writing</li>
-                      <li>Creative writing</li>
-                    </ul>
-                  </div>
-                  <div>
-                    <h3 class="font-semibold">Everyone Else</h3>
-                    <ul class="list-disc pl-6">
-                      <li>Personal journaling</li>
-                      <li>Quick note-taking</li>
-                      <li>List making</li>
-                    </ul>
-                  </div>
+            <!-- Ad Banner 1 -->
+            <div class="ad-banner">
+                <div class="ad-placeholder">
+                    Advertisement Space
                 </div>
+            </div>
 
-                <h2 class="text-2xl font-semibold mb-3 mt-6">Conclusion</h2>
-                <p>More than just a notepad, this is your digital writing partner. With powerful features, user-friendly design, and complete flexibility, writing has never been easier.</p>
-              </div>
-            </article>
-          </div>
-        </main>
-      </div>
+            <!-- Editor Section -->
+            <div class="editor-container">
+                <div class="filename-container">
+                    <input type="text" id="file-name" placeholder="Untitled Document" class="filename-input">
+                    <span id="word-count" class="word-count">0 words</span>
+                </div>
+                <div id="editor"></div>
+                <div class="editor-status">
+                    <div id="save-status">All changes saved</div>
+                </div>
+            </div>
+
+            <!-- Ad Banner 2 -->
+            <div class="ad-banner">
+                <div class="ad-placeholder">
+                    Advertisement Space
+                </div>
+            </div>
+
+            <!-- SEO Article Section -->
+            <div class="seo-article">
+                <h2>Online Notepad: The Ultimate Free Text Editor for Your Browser</h2>
+                <p>Our Online Notepad provides a seamless, intuitive text editing experience directly in your web browser. No downloads, no installations—just pure productivity at your fingertips.</p>
+                
+                <h3>Features That Make Our Online Notepad Stand Out</h3>
+                <p>Whether you're jotting down quick thoughts, drafting an important document, or storing information for later, our notepad offers all the functionality you need:</p>
+                <ul>
+                    <li><strong>Instant Access:</strong> Works on any device with a browser—no software installation required</li>
+                    <li><strong>Rich Text Formatting:</strong> Bold, italic, underline, lists, and more to organize your thoughts</li>
+                    <li><strong>Cloud Saving:</strong> Never lose your work with automatic saving to your browser</li>
+                    <li><strong>Export Options:</strong> Download your notes as TXT, PDF, or DOCX files</li>
+                    <li><strong>Clean Interface:</strong> Distraction-free writing environment</li>
+                    <li><strong>File Management:</strong> Create, save, and organize multiple documents</li>
+                </ul>
+                
+                <h3>Why Use an Online Notepad?</h3>
+                <p>In today's fast-paced digital world, having a reliable online notepad offers numerous advantages:</p>
+                <ol>
+                    <li><strong>Accessibility:</strong> Access your notes from anywhere, on any device</li>
+                    <li><strong>Convenience:</strong> No need to search for a pen and paper or open heavy applications</li>
+                    <li><strong>Organization:</strong> Keep all your notes in one central location</li>
+                    <li><strong>Environmentally Friendly:</strong> Reduce paper waste by taking notes digitally</li>
+                    <li><strong>Sharing Capabilities:</strong> Easily export and share your notes with others</li>
+                </ol>
+                
+                <h3>Boosting Your Productivity with Online Notes</h3>
+                <p>Our free online notepad is more than just a text editor—it's a productivity tool designed to streamline your workflow:</p>
+                <ul>
+                    <li>Capture ideas instantly when inspiration strikes</li>
+                    <li>Keep track of to-do lists and important information</li>
+                    <li>Draft content before transferring to other platforms</li>
+                    <li>Store code snippets, recipes, or any text you need to reference later</li>
+                    <li>Access your notes across multiple devices without synchronization issues</li>
+                </ul>
+                
+                <p>Experience the freedom and flexibility of our browser-based notepad today. Whether for work, study, or personal use, our online text editor provides a reliable solution for all your note-taking needs—completely free and without registration.</p>
+            </div>
+
+            <!-- Footer -->
+            <footer class="footer">
+                <p>&copy; 2023 Online Notepad. All rights reserved.</p>
+            </footer>
+        </div>
     </div>
-  </div>
-  <script src="script.js" type="module"></script>
+
+    <!-- Modals -->
+    <div id="rename-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Rename File</h3>
+            <input type="text" id="rename-input" placeholder="New filename">
+            <div class="modal-buttons">
+                <button id="rename-cancel" class="btn">Cancel</button>
+                <button id="rename-confirm" class="btn primary-btn">Rename</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="delete-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Delete File</h3>
+            <p>Are you sure you want to delete this file? This action cannot be undone.</p>
+            <div class="modal-buttons">
+                <button id="delete-cancel" class="btn">Cancel</button>
+                <button id="delete-confirm" class="btn danger-btn">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
 </body>
 </html>
