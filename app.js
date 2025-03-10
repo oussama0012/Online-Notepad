@@ -154,8 +154,20 @@ function renameCurrentFile(newName) {
     if (currentFile && newName) {
         currentFile.name = newName;
         document.getElementById('file-name').value = newName;
-        saveCurrentFile();
-        renderFileList(); 
+        
+        // Update files array and save
+        const fileIndex = files.findIndex(f => f.id === currentFile.id);
+        if (fileIndex >= 0) {
+            files[fileIndex] = currentFile;
+        }
+        
+        saveFiles();
+        renderFileList();
+        
+        // Show success toast
+        showToast('File renamed successfully', 'success');
+    } else {
+        showToast('Failed to rename file', 'error');
     }
 }
 
@@ -168,17 +180,9 @@ function countWords() {
 
 // Update the save status indicator
 function updateSaveStatus(message) {
-    const saveStatus = document.getElementById('save-status');
-    saveStatus.textContent = message;
-    
-    if (message === 'Unsaved changes') {
-        saveStatus.style.color = '#e74c3c';
-        saveStatus.classList.add('unsaved');
-    } else {
-        saveStatus.style.color = '#2ecc71';
-        saveStatus.classList.remove('unsaved');
-        
-        // Only show toast notification when explicitly saving
+    // This function still exists but we're not displaying the status element
+    // We'll still show toast notifications when explicitly saving
+    if (message !== 'Unsaved changes') {
         showToast(message, 'success');
     }
 }
@@ -337,7 +341,7 @@ function setupEventListeners() {
     document.getElementById('open-file-btn').addEventListener('click', () => {
         const fileInput = document.createElement('input');
         fileInput.type = 'file';
-        fileInput.accept = '.txt, .html, .md, .js, .css, .pdf, .docx'; // Added PDF and DOCX
+        fileInput.accept = '.txt, .html, .md, .js, .css, .json, .log'; 
         
         fileInput.onchange = (e) => {
             const file = e.target.files[0];
@@ -345,20 +349,12 @@ function setupEventListeners() {
                 const reader = new FileReader();
                 reader.onload = (event) => {
                     const fileName = file.name.split('.')[0];
-                    const fileExt = file.name.split('.').pop().toLowerCase();
-                    
-                    // Check if file type is supported for direct editing
-                    if (fileExt === 'pdf' || fileExt === 'docx') {
-                        showToast(`${fileExt.toUpperCase()} files can only be exported, not imported for editing`, 'warning');
-                        return;
-                    }
-                    
                     const content = event.target.result;
                     
                     // Create a new file in our app with the content
                     const newFile = {
                         id: Date.now().toString(),
-                        name: fileName,
+                        name: file.name,
                         content: content,
                         created: new Date(),
                         modified: new Date()
@@ -368,14 +364,16 @@ function setupEventListeners() {
                     saveFiles();
                     renderFileList();
                     openFile(newFile.id);
+                    
+                    showToast(`Opened file: ${file.name}`, 'success');
                 };
                 
-                // Use the appropriate method based on file type
-                if (file.type === 'application/pdf') {
-                    showToast("PDF files cannot be imported for editing", 'warning');
-                    return;
-                } else {
+                // Use appropriate method based on file type
+                if (file.type.startsWith('text/') || 
+                    ['.txt', '.html', '.md', '.js', '.css', '.json', '.log'].includes(file.name.slice(file.name.lastIndexOf('.')))) {
                     reader.readAsText(file);
+                } else {
+                    showToast('Unsupported file type', 'warning');
                 }
             }
         };
@@ -417,8 +415,9 @@ function setupEventListeners() {
         const newName = document.getElementById('rename-input').value.trim();
         if (newName) {
             renameCurrentFile(newName);
-            document.getElementById('rename-modal').style.display = 'none';
-            document.getElementById('rename-modal').classList.remove('show');
+            hideModal('rename-modal');
+        } else {
+            showToast('Please enter a valid filename', 'warning');
         }
     });
     
