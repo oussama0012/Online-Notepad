@@ -1,498 +1,525 @@
-// Initialize variables for file management
-let currentFile = null;
-let files = [];
-let editor;
+class NotepadApp {
+    constructor() {
+        this.notepad = document.getElementById('notepad');
+        this.charCount = document.getElementById('charCount');
+        this.wordCount = document.getElementById('wordCount');
+        this.toolbarBtns = document.querySelectorAll('.toolbar-btn');
+        this.colorPicker = document.getElementById('textColorPicker');
+        this.fontSelector = document.getElementById('fontSelector');
+        this.fontSizeSelector = document.getElementById('fontSizeSelector');
+        this.savedFilesContainer = document.getElementById('savedFilesContainer');
+        this.savedFilesList = document.getElementById('savedFilesList');
+        this.toggleSavedFilesBtn = document.getElementById('toggleSavedFiles');
+        this.hasUnsavedChanges = false;
+        this.savedContent = '';
+        this.undoStack = [];
+        this.redoStack = [];
+        this.lastSavedState = '';
+        this.isUndoRedo = false;
+        this.currentNoteId = null;
+        this.savedNotes = {};
 
-// Initialize the Quill editor
-document.addEventListener('DOMContentLoaded', function() {
-    // Setup Quill with toolbar options
-    editor = new Quill('#editor', {
-        theme: 'snow',
-        modules: {
-            toolbar: [
-                [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-                ['bold', 'italic', 'underline', 'strike'],
-                [{ 'align': [] }],
-                [{ 'color': [] }, { 'background': [] }],
-                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                ['link', 'image', 'code-block'],
-                ['clean']
-            ]
-        },
-        placeholder: 'Start typing here...'
-    });
+        this.setupEventListeners();
+        this.loadSavedNotes();
+        this.renderSavedFiles();
+        
+        // Initialize toggle button as collapsed
+        this.toggleSavedFilesBtn.classList.add('collapsed');
+    }
 
-    // Load files from localStorage
-    loadFiles();
-    renderFileList();
+    setupEventListeners() {
+        this.notepad.addEventListener('input', () => {
+            if (!this.isUndoRedo) {
+                this.undoStack.push(this.notepad.value);
+                this.redoStack = [];
+            }
+            this.isUndoRedo = false;
+            this.updateStats();
+            this.checkForChanges();
+        });
+        
+        this.toolbarBtns.forEach(btn => {
+            btn.addEventListener('click', () => this.handleToolbarAction(btn.dataset.action));
+        });
 
-    // Auto-save content periodically
-    let autoSaveInterval = setInterval(() => {
-        if (currentFile) {
-            saveCurrentFile();
-            updateSaveStatus('All changes saved');
+        this.colorPicker.addEventListener('change', (e) => {
+            this.notepad.style.color = e.target.value;
+        });
+        
+        this.fontSelector.addEventListener('change', (e) => {
+            this.notepad.style.fontFamily = e.target.value;
+        });
+        
+        this.fontSizeSelector.addEventListener('change', (e) => {
+            this.notepad.style.fontSize = e.target.value + 'px';
+        });
+
+        this.toggleSavedFilesBtn.addEventListener('click', () => {
+            this.toggleSavedFilesPanel();
+        });
+    }
+
+    toggleSavedFilesPanel() {
+        const filesList = this.savedFilesList;
+        const toggleBtn = this.toggleSavedFilesBtn;
+        
+        if (filesList.style.display === 'none') {
+            filesList.style.display = 'flex';
+            toggleBtn.classList.remove('collapsed');
+        } else {
+            filesList.style.display = 'none';
+            toggleBtn.classList.add('collapsed');
         }
-    }, 30000); // Auto-save every 30 seconds
-
-    // Text change handler for word count and save status
-    editor.on('text-change', function() {
-        countWords();
-        updateSaveStatus('Unsaved changes');
-    });
-
-    // Initialize event listeners
-    setupEventListeners();
-});
-
-// Load files from localStorage
-function loadFiles() {
-    const savedFiles = localStorage.getItem('notepad-files');
-    if (savedFiles) {
-        files = JSON.parse(savedFiles);
     }
-}
 
-// Save files to localStorage
-function saveFiles() {
-    localStorage.setItem('notepad-files', JSON.stringify(files));
-}
-
-// Render the file list in the sidebar
-function renderFileList() {
-    const fileList = document.getElementById('file-list');
-    fileList.innerHTML = '';
-
-    files.forEach(file => {
-        const li = document.createElement('li');
-        li.innerHTML = `<i class="fas fa-file-alt"></i> ${file.name}`;
-        li.dataset.id = file.id;
-        
-        if (currentFile && file.id === currentFile.id) {
-            li.classList.add('active');
-        }
-        
-        li.addEventListener('click', () => openFile(file.id));
-        fileList.appendChild(li);
-    });
-}
-
-// Create a new file
-function createNewFile() {
-    const fileName = 'Untitled Document';
-    const newFile = {
-        id: Date.now().toString(),
-        name: fileName,
-        content: '',
-        created: new Date(),
-        modified: new Date()
-    };
-    
-    files.push(newFile);
-    saveFiles();
-    renderFileList();
-    openFile(newFile.id);
-}
-
-// Open a file
-function openFile(fileId) {
-    if (currentFile) {
-        saveCurrentFile(); // Save current file before opening a new one
-    }
-    
-    const file = files.find(f => f.id === fileId);
-    if (file) {
-        currentFile = file;
-        document.getElementById('file-name').value = file.name;
-        editor.root.innerHTML = file.content;
-        countWords();
-        updateSaveStatus('All changes saved');
-        renderFileList(); // Update active file in list
-    }
-}
-
-// Save the current file
-function saveCurrentFile() {
-    if (currentFile) {
-        const fileName = document.getElementById('file-name').value.trim() || 'Untitled Document';
-        currentFile.name = fileName;
-        currentFile.content = editor.root.innerHTML;
-        currentFile.modified = new Date();
-        
-        const fileIndex = files.findIndex(f => f.id === currentFile.id);
-        if (fileIndex >= 0) {
-            files[fileIndex] = currentFile;
+    loadSavedNotes() {
+        const savedNotesJSON = localStorage.getItem('savedNotes');
+        if (savedNotesJSON) {
+            this.savedNotes = JSON.parse(savedNotesJSON);
         }
         
-        saveFiles();
-        renderFileList();
-    }
-}
-
-// Delete the current file
-function deleteCurrentFile() {
-    if (currentFile) {
-        const fileIndex = files.findIndex(f => f.id === currentFile.id);
-        if (fileIndex >= 0) {
-            files.splice(fileIndex, 1);
-            saveFiles();
-            renderFileList();
+        // Backward compatibility with previous version
+        const oldSavedNote = localStorage.getItem('savedNote');
+        if (oldSavedNote && Object.keys(this.savedNotes).length === 0) {
+            const noteId = 'note_' + Date.now();
+            this.savedNotes[noteId] = {
+                content: oldSavedNote,
+                title: this.generateTitle(oldSavedNote),
+                lastModified: new Date().toISOString()
+            };
+            localStorage.setItem('savedNotes', JSON.stringify(this.savedNotes));
+            localStorage.removeItem('savedNote'); // Remove old format
+        }
+        
+        // Load the most recent note if available
+        if (Object.keys(this.savedNotes).length > 0) {
+            // Sort by last modified date and get the most recent
+            const sortedNotes = Object.entries(this.savedNotes)
+                .sort((a, b) => new Date(b[1].lastModified) - new Date(a[1].lastModified));
             
-            if (files.length > 0) {
-                openFile(files[0].id);
-            } else {
-                currentFile = null;
-                document.getElementById('file-name').value = '';
-                editor.root.innerHTML = '';
-                countWords();
+            if (sortedNotes.length > 0) {
+                const [noteId, note] = sortedNotes[0];
+                this.loadNote(noteId);
             }
         }
     }
-}
 
-// Rename the current file
-function renameCurrentFile(newName) {
-    if (currentFile && newName) {
-        currentFile.name = newName;
-        document.getElementById('file-name').value = newName;
+    renderSavedFiles() {
+        this.savedFilesList.innerHTML = '';
         
-        // Update files array and save
-        const fileIndex = files.findIndex(f => f.id === currentFile.id);
-        if (fileIndex >= 0) {
-            files[fileIndex] = currentFile;
+        if (Object.keys(this.savedNotes).length === 0) {
+            this.savedFilesList.innerHTML = `
+                <div class="empty-files-message">No saved notes yet</div>
+            `;
+            return;
         }
         
-        saveFiles();
-        renderFileList();
+        // Sort notes by last modified date (newest first)
+        const sortedNotes = Object.entries(this.savedNotes)
+            .sort((a, b) => new Date(b[1].lastModified) - new Date(a[1].lastModified));
         
-        // Show success toast
-        showToast('File renamed successfully', 'success');
-    } else {
-        showToast('Failed to rename file', 'error');
-    }
-}
-
-// Count words in the editor
-function countWords() {
-    const text = editor.getText().trim();
-    const wordCount = text ? text.split(/\s+/).length : 0;
-    document.getElementById('word-count').textContent = `${wordCount} words`;
-}
-
-// Update the save status indicator
-function updateSaveStatus(message) {
-    // This function still exists but we're not displaying the status element
-    // We'll still show toast notifications when explicitly saving
-    if (message !== 'Unsaved changes') {
-        showToast(message, 'success');
-    }
-}
-
-// Helper function to download a blob
-function downloadBlob(blob, fileName) {
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = fileName;
-    link.click();
-    URL.revokeObjectURL(link.href);
-    
-    // Show success message
-    showToast(`Successfully exported as ${fileName}`, 'success');
-}
-
-// Show toast notification
-function showToast(message, type = 'success') {
-    const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
-    toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'warning' ? 'fa-exclamation-triangle' : 'fa-exclamation-circle'}"></i> ${message}`;
-    document.body.appendChild(toast);
-    
-    setTimeout(() => {
-        toast.classList.add('show');
-    }, 10);
-    
-    setTimeout(() => {
-        toast.classList.remove('show');
-        setTimeout(() => {
-            document.body.removeChild(toast);
-        }, 300);
-    }, 3000);
-}
-
-// Export functions
-function exportAsTxt() {
-    if (!currentFile) {
-        showToast('No file to export', 'error');
-        return;
-    }
-    
-    const fileName = currentFile.name || 'document';
-    const text = editor.getText();
-    const blob = new Blob([text], { type: 'text/plain' });
-    downloadBlob(blob, `${fileName}.txt`);
-}
-
-function exportAsPdf() {
-    if (!currentFile) {
-        showToast('No file to export', 'error');
-        return;
-    }
-    
-    const fileName = currentFile.name || 'document';
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    
-    // Convert editor content to plain text for now
-    // For a more advanced solution, html2canvas can be used
-    const text = editor.getText();
-    const lines = doc.splitTextToSize(text, 180);
-    
-    doc.text(lines, 15, 15);
-    doc.save(`${fileName}.pdf`);
-    showToast(`Successfully exported as ${fileName}.pdf`, 'success');
-}
-
-function exportAsDocx() {
-    if (!currentFile) {
-        showToast('No file to export', 'error');
-        return;
-    }
-    
-    const fileName = currentFile.name || 'document';
-    const text = editor.getText();
-    
-    // Access the docx library through the global window object
-    const Document = window.docx.Document;
-    const Paragraph = window.docx.Paragraph;
-    const TextRun = window.docx.TextRun;
-    const Packer = window.docx.Packer;
-    
-    const doc = new Document({
-        sections: [{
-            properties: {},
-            children: [
-                new Paragraph({
-                    children: [new TextRun(text)]
-                })
-            ]
-        }]
-    });
-    
-    Packer.toBlob(doc).then(blob => {
-        downloadBlob(blob, `${fileName}.docx`);
-    }).catch(err => {
-        showToast('Failed to export as DOCX', 'error');
-        console.error(err);
-    });
-}
-
-// Toggle fullscreen mode
-function toggleFullscreen() {
-    const editorContainer = document.querySelector('.editor-container');
-    editorContainer.classList.toggle('fullscreen');
-    
-    const fullscreenBtn = document.getElementById('fullscreen-btn');
-    if (editorContainer.classList.contains('fullscreen')) {
-        fullscreenBtn.innerHTML = '<i class="fas fa-compress"></i>';
-        fullscreenBtn.textContent = ' Exit Fullscreen';
-        fullscreenBtn.style.position = 'fixed';
-        fullscreenBtn.style.top = '20px';
-        fullscreenBtn.style.right = '20px';
-        fullscreenBtn.style.zIndex = '10000';
-    } else {
-        fullscreenBtn.innerHTML = '<i class="fas fa-expand"></i>';
-        fullscreenBtn.textContent = ' Fullscreen';
-        fullscreenBtn.style.position = '';
-        fullscreenBtn.style.top = '';
-        fullscreenBtn.style.right = '';
-        fullscreenBtn.style.zIndex = '';
-    }
-}
-
-// Modal functions
-function showModal(modalId) {
-    const modal = document.getElementById(modalId);
-    modal.style.display = 'block';
-    setTimeout(() => {
-        modal.classList.add('show');
-    }, 10);
-}
-
-function hideModal(modalId) {
-    const modal = document.getElementById(modalId);
-    modal.classList.remove('show');
-    setTimeout(() => {
-        modal.style.display = 'none';
-    }, 300);
-}
-
-// Setup all event listeners
-function setupEventListeners() {
-    // New file button
-    document.getElementById('new-file-btn').addEventListener('click', createNewFile);
-    
-    // Save button
-    document.getElementById('save-file-btn').addEventListener('click', () => {
-        saveCurrentFile();
-        updateSaveStatus('All changes saved');
-        showToast('All changes saved', 'success');
-    });
-    
-    // Open file button - Changed to allow opening files from desktop
-    document.getElementById('open-file-btn').addEventListener('click', () => {
-        const fileInput = document.createElement('input');
-        fileInput.type = 'file';
-        fileInput.accept = '.txt, .html, .md, .js, .css, .json, .log'; 
-        
-        fileInput.onchange = (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    const fileName = file.name.split('.')[0];
-                    const content = event.target.result;
-                    
-                    // Create a new file in our app with the content
-                    const newFile = {
-                        id: Date.now().toString(),
-                        name: file.name,
-                        content: content,
-                        created: new Date(),
-                        modified: new Date()
-                    };
-                    
-                    files.push(newFile);
-                    saveFiles();
-                    renderFileList();
-                    openFile(newFile.id);
-                    
-                    showToast(`Opened file: ${file.name}`, 'success');
-                };
-                
-                // Use appropriate method based on file type
-                if (file.type.startsWith('text/') || 
-                    ['.txt', '.html', '.md', '.js', '.css', '.json', '.log'].includes(file.name.slice(file.name.lastIndexOf('.')))) {
-                    reader.readAsText(file);
-                } else {
-                    showToast('Unsupported file type', 'warning');
+        for (const [noteId, note] of sortedNotes) {
+            const isActive = noteId === this.currentNoteId;
+            const noteCard = document.createElement('div');
+            noteCard.className = `saved-file-card ${isActive ? 'active' : ''}`;
+            noteCard.dataset.noteId = noteId;
+            
+            const formattedDate = this.formatDate(new Date(note.lastModified));
+            
+            noteCard.innerHTML = `
+                <div class="saved-file-title">${note.title || 'Untitled Note'}</div>
+                <div class="saved-file-preview">${note.content.substring(0, 120)}</div>
+                <div class="saved-file-date">${formattedDate}</div>
+                <div class="saved-file-actions">
+                    <button class="file-action-btn rename-note" data-note-id="${noteId}">
+                        <i class="ri-edit-line"></i>
+                    </button>
+                    <button class="file-action-btn delete-note" data-note-id="${noteId}">
+                        <i class="ri-delete-bin-line"></i>
+                    </button>
+                </div>
+            `;
+            
+            noteCard.addEventListener('click', (e) => {
+                // Ignore clicks on the action buttons
+                if (!e.target.closest('.delete-note') && !e.target.closest('.rename-note')) {
+                    this.loadNote(noteId);
                 }
+            });
+            
+            this.savedFilesList.appendChild(noteCard);
+        }
+        
+        // Add event listeners for delete buttons
+        document.querySelectorAll('.delete-note').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent card click
+                const noteId = btn.dataset.noteId;
+                this.deleteNote(noteId);
+            });
+        });
+        
+        // Add event listeners for rename buttons
+        document.querySelectorAll('.rename-note').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent card click
+                const noteId = btn.dataset.noteId;
+                this.renameNote(noteId);
+            });
+        });
+    }
+
+    formatDate(date) {
+        const now = new Date();
+        const yesterday = new Date(now);
+        yesterday.setDate(now.getDate() - 1);
+        
+        if (date.toDateString() === now.toDateString()) {
+            return `Today, ${date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+        } else if (date.toDateString() === yesterday.toDateString()) {
+            return `Yesterday, ${date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+        } else {
+            return date.toLocaleDateString([], {
+                month: 'short', 
+                day: 'numeric',
+                year: now.getFullYear() !== date.getFullYear() ? 'numeric' : undefined
+            });
+        }
+    }
+
+    generateTitle(content) {
+        // Extract first line or first few words as title
+        const firstLine = content.split('\n')[0].trim();
+        if (firstLine.length > 0) {
+            return firstLine.length > 30 ? firstLine.substring(0, 30) + '...' : firstLine;
+        }
+        return 'Untitled Note';
+    }
+
+    loadNote(noteId) {
+        if (this.hasUnsavedChanges) {
+            // Show save dialog before loading another note
+            this.showSaveDialog(() => this.doLoadNote(noteId));
+            return;
+        }
+        
+        this.doLoadNote(noteId);
+    }
+    
+    doLoadNote(noteId) {
+        const note = this.savedNotes[noteId];
+        if (note) {
+            this.notepad.value = note.content;
+            this.savedContent = note.content;
+            this.currentNoteId = noteId;
+            this.hasUnsavedChanges = false;
+            this.updateStats();
+            this.undoStack = [];
+            this.redoStack = [];
+            
+            // Update active state in UI
+            this.renderSavedFiles();
+        }
+    }
+
+    deleteNote(noteId) {
+        if (confirm('Are you sure you want to delete this note?')) {
+            delete this.savedNotes[noteId];
+            localStorage.setItem('savedNotes', JSON.stringify(this.savedNotes));
+            
+            // If the deleted note was the current note, clear the editor
+            if (noteId === this.currentNoteId) {
+                this.createNewNote();
             }
+            
+            this.renderSavedFiles();
+        }
+    }
+
+    renameNote(noteId) {
+        const note = this.savedNotes[noteId];
+        if (!note) return;
+        
+        const newTitle = prompt('Enter a new name for this note:', note.title || 'Untitled Note');
+        
+        // If user cancels or enters empty string, keep the old title
+        if (newTitle === null || newTitle.trim() === '') return;
+        
+        // Update the note title
+        note.title = newTitle.trim();
+        note.lastModified = new Date().toISOString();
+        
+        // Save to localStorage
+        localStorage.setItem('savedNotes', JSON.stringify(this.savedNotes));
+        
+        // Update UI
+        this.renderSavedFiles();
+        this.createToast('Note renamed successfully!');
+    }
+
+    checkForChanges() {
+        this.hasUnsavedChanges = this.notepad.value !== this.savedContent;
+    }
+
+    handleToolbarAction(action) {
+        switch(action) {
+            case 'new':
+                this.createNewNote();
+                break;
+            case 'save':
+                this.saveNote();
+                break;
+            case 'download':
+                this.downloadNote();
+                break;
+            case 'bold':
+                this.toggleTextStyle('fontWeight', 'bold', 'normal');
+                break;
+            case 'italic':
+                this.toggleTextStyle('fontStyle', 'italic', 'normal');
+                break;
+            case 'underline':
+                this.toggleTextStyle('textDecoration', 'underline', 'none');
+                break;
+            case 'undo':
+                this.undo();
+                break;
+            case 'redo':
+                this.redo();
+                break;
+            case 'fullscreen':
+                this.toggleFullscreen();
+                break;
+        }
+    }
+
+    createNewNote() {
+        if (this.notepad.value.trim() !== '' && this.hasUnsavedChanges) {
+            this.showSaveDialog(() => this.clearNotepad());
+        } else {
+            this.clearNotepad();
+        }
+    }
+
+    showSaveDialog(onComplete = null) {
+        const modal = document.createElement('div');
+        modal.className = 'save-modal';
+        modal.innerHTML = `
+            <div class="save-modal-content">
+                <h3>Save your work?</h3>
+                <p>Your note has unsaved changes. What would you like to do?</p>
+                <div class="save-modal-buttons">
+                    <button id="modal-save">Save Note</button>
+                    <button id="modal-export">Export File</button>
+                    <button id="modal-discard">Discard</button>
+                    <button id="modal-cancel">Cancel</button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        // Add subtle animation when buttons are pressed
+        const buttons = modal.querySelectorAll('button');
+        buttons.forEach(button => {
+            button.addEventListener('mousedown', () => {
+                button.style.transform = 'scale(0.98)';
+            });
+            button.addEventListener('mouseup', () => {
+                button.style.transform = '';
+            });
+        });
+        
+        document.getElementById('modal-save').addEventListener('click', () => {
+            this.saveNote();
+            if (onComplete) onComplete();
+            document.body.removeChild(modal);
+        });
+        
+        document.getElementById('modal-discard').addEventListener('click', () => {
+            if (onComplete) onComplete();
+            document.body.removeChild(modal);
+        });
+        
+        document.getElementById('modal-export').addEventListener('click', () => {
+            this.downloadNote();
+            document.body.removeChild(modal);
+        });
+        
+        document.getElementById('modal-cancel').addEventListener('click', () => {
+            document.body.removeChild(modal);
+        });
+    }
+
+    updateStats() {
+        const text = this.notepad.value;
+        const chars = text.length;
+        const words = text.trim().split(/\s+/).filter(word => word.length > 0).length;
+
+        this.charCount.textContent = `${chars} characters`;
+        this.wordCount.textContent = `${words} words`;
+    }
+
+    toggleTextStyle(style, activeValue, defaultValue) {
+        const currentValue = this.notepad.style[style];
+        this.notepad.style[style] = 
+            currentValue === activeValue ? defaultValue : activeValue;
+            
+        // Update the active state of the button
+        const button = document.querySelector(`[data-action="${style === 'fontWeight' ? 'bold' : 
+                                             style === 'fontStyle' ? 'italic' : 
+                                             'underline'}"]`);
+        if (button) {
+            if (this.notepad.style[style] === activeValue) {
+                button.classList.add('active');
+            } else {
+                button.classList.remove('active');
+            }
+        }
+    }
+
+    clearNotepad() {
+        this.notepad.value = '';
+        this.notepad.style.fontWeight = 'normal';
+        this.notepad.style.fontStyle = 'normal';
+        this.notepad.style.textDecoration = 'none';
+        this.notepad.style.color = 'var(--text-primary)';
+        this.updateStats();
+        this.savedContent = '';
+        this.hasUnsavedChanges = false;
+        this.currentNoteId = null;
+    }
+
+    createToast(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        toast.innerHTML = `
+            <div class="toast-content">
+                <i class="${this.getToastIcon(type)}"></i>
+                <span>${message}</span>
+            </div>
+            <div class="toast-progress"></div>
+        `;
+        
+        document.body.appendChild(toast);
+        
+        // Remove toast after animation
+        setTimeout(() => {
+            toast.classList.add('toast-exit');
+            setTimeout(() => {
+                document.body.removeChild(toast);
+            }, 500);
+        }, 3000);
+    }
+
+    getToastIcon(type) {
+        const icons = {
+            'success': 'ri-check-line',
+            'error': 'ri-error-warning-line',
+            'warning': 'ri-alert-line'
+        };
+        return icons[type] || 'ri-information-line';
+    }
+
+    saveNote() {
+        const content = this.notepad.value;
+        const title = this.generateTitle(content);
+        const lastModified = new Date().toISOString();
+        
+        // Create a new note or update existing one
+        if (!this.currentNoteId) {
+            this.currentNoteId = 'note_' + Date.now();
+        }
+        
+        this.savedNotes[this.currentNoteId] = {
+            content,
+            title,
+            lastModified
         };
         
-        fileInput.click();
-    });
-    
-    // Delete file button
-    document.getElementById('delete-file-btn').addEventListener('click', () => {
-        if (currentFile) {
-            showModal('delete-modal');
-        } else {
-            showToast('No file selected to delete', 'warning');
-        }
-    });
-    
-    document.getElementById('delete-confirm').addEventListener('click', () => {
-        deleteCurrentFile();
-        hideModal('delete-modal');
-        showToast('File deleted successfully', 'success');
-    });
-    
-    document.getElementById('delete-cancel').addEventListener('click', () => {
-        hideModal('delete-modal');
-    });
-    
-    // Rename file button
-    document.getElementById('rename-file-btn').addEventListener('click', () => {
-        if (currentFile) {
-            document.getElementById('rename-input').value = currentFile.name;
-            document.getElementById('rename-modal').style.display = 'block';
-            setTimeout(() => {
-                document.getElementById('rename-modal').classList.add('show');
-            }, 10);
-        }
-    });
-    
-    document.getElementById('rename-confirm').addEventListener('click', () => {
-        const newName = document.getElementById('rename-input').value.trim();
-        if (newName) {
-            renameCurrentFile(newName);
-            hideModal('rename-modal');
-        } else {
-            showToast('Please enter a valid filename', 'warning');
-        }
-    });
-    
-    document.getElementById('rename-cancel').addEventListener('click', () => {
-        document.getElementById('rename-modal').style.display = 'none';
-        document.getElementById('rename-modal').classList.remove('show');
-    });
-    
-    // File name input change
-    document.getElementById('file-name').addEventListener('blur', () => {
-        saveCurrentFile();
-        updateSaveStatus('All changes saved');
-    });
-    
-    // Export dropdown functionality
-    document.getElementById('export-file-btn').addEventListener('click', function(e) {
-        e.preventDefault();
-        const dropdown = document.querySelector('.dropdown-content');
-        dropdown.classList.toggle('show');
+        localStorage.setItem('savedNotes', JSON.stringify(this.savedNotes));
+        this.savedContent = content;
+        this.hasUnsavedChanges = false;
+        this.lastSavedState = content;
         
-        // Close dropdown when clicking outside
-        document.addEventListener('click', function closeDropdown(e) {
-            if (!e.target.matches('#export-file-btn') && !e.target.closest('.dropdown-content')) {
-                dropdown.classList.remove('show');
-                document.removeEventListener('click', closeDropdown);
-            }
-        });
-    });
-    
-    // Export buttons
-    document.getElementById('export-txt').addEventListener('click', function(e) {
-        e.preventDefault();
-        exportAsTxt();
-        document.querySelector('.dropdown-content').classList.remove('show');
-    });
-    
-    document.getElementById('export-pdf').addEventListener('click', function(e) {
-        e.preventDefault();
-        exportAsPdf();
-        document.querySelector('.dropdown-content').classList.remove('show');
-    });
-    
-    document.getElementById('export-docx').addEventListener('click', function(e) {
-        e.preventDefault();
-        exportAsDocx();
-        document.querySelector('.dropdown-content').classList.remove('show');
-    });
-    
-    // Fullscreen button - moving the event listener to maintain functionality 
-    // for the button that will now be in the toolbar
-    document.getElementById('fullscreen-btn').addEventListener('click', toggleFullscreen);
-    
-    // Close buttons for modals
-    document.querySelectorAll('.close').forEach(closeBtn => {
-        closeBtn.addEventListener('click', () => {
-            const modal = closeBtn.closest('.modal');
-            hideModal(modal.id);
-        });
-    });
-    
-    // Close modals when clicking outside
-    window.addEventListener('click', (event) => {
-        document.querySelectorAll('.modal').forEach(modal => {
-            if (event.target === modal) {
-                modal.style.display = 'none';
-            }
-        });
-    });
+        this.renderSavedFiles();
+        this.createToast('Note saved successfully!');
+    }
+
+    downloadNote() {
+        const blob = new Blob([this.notepad.value], {type: 'text/plain'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'note.txt';
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    undo() {
+        if (this.undoStack.length > 0) {
+            // Save current state to redo stack
+            this.redoStack.push(this.notepad.value);
+            
+            // Pop the last state from undo stack
+            const previousState = this.undoStack.pop();
+            
+            // Set the flag to prevent adding to undo stack
+            this.isUndoRedo = true;
+            
+            // Apply the previous state
+            this.notepad.value = previousState;
+            this.updateStats();
+            this.checkForChanges();
+        }
+    }
+
+    redo() {
+        if (this.redoStack.length > 0) {
+            // Save current state to undo stack
+            this.undoStack.push(this.notepad.value);
+            
+            // Pop the last state from redo stack
+            const nextState = this.redoStack.pop();
+            
+            // Set the flag to prevent adding to undo stack
+            this.isUndoRedo = true;
+            
+            // Apply the next state
+            this.notepad.value = nextState;
+            this.updateStats();
+            this.checkForChanges();
+        }
+    }
+
+    toggleFullscreen() {
+        const container = document.querySelector('.notepad-container');
+        
+        if (document.fullscreenElement) {
+            document.exitFullscreen();
+            this.updateFullscreenButton(false);
+        } else {
+            container.requestFullscreen().catch(err => {
+                this.createToast(`Error: ${err.message}`, 'error');
+            });
+            this.updateFullscreenButton(true);
+        }
+    }
+
+    updateFullscreenButton(isFullscreen) {
+        const button = document.querySelector('[data-action="fullscreen"]');
+        const icon = button.querySelector('i');
+        if (icon) {
+            icon.className = isFullscreen ? 'ri-fullscreen-exit-line' : 'ri-fullscreen-line';
+        }
+        
+        // Toggle active class
+        if (isFullscreen) {
+            button.classList.add('active');
+        } else {
+            button.classList.remove('active');
+        }
+    }
 }
 
-// Create a default first file if none exists
-window.addEventListener('load', function() {
-    if (files.length === 0) {
-        createNewFile();
-    } else {
-        openFile(files[0].id);
-    }
-});
+new NotepadApp();
