@@ -24,33 +24,33 @@
         <div class="notepad-container">
             <div class="toolbar">
                 <div class="toolbar-section">
-                    <button class="toolbar-btn" data-action="new" data-tooltip="New Note">
+                    <button class="toolbar-btn" data-action="new">
                         <i class="ri-file-add-line"></i>
                     </button>
-                    <button class="toolbar-btn" data-action="save" data-tooltip="Save">
+                    <button class="toolbar-btn" data-action="save">
                         <i class="ri-save-line"></i>
                     </button>
-                    <button class="toolbar-btn" data-action="download" data-tooltip="Download">
+                    <button class="toolbar-btn" data-action="download">
                         <i class="ri-download-line"></i>
                     </button>
-                    <button class="toolbar-btn" data-action="undo" data-tooltip="Undo">
+                    <button class="toolbar-btn" data-action="undo">
                         <i class="ri-arrow-go-back-line"></i>
                     </button>
-                    <button class="toolbar-btn" data-action="redo" data-tooltip="Redo">
+                    <button class="toolbar-btn" data-action="redo">
                         <i class="ri-arrow-go-forward-line"></i>
                     </button>
-                    <button class="toolbar-btn" data-action="fullscreen" data-tooltip="Fullscreen">
+                    <button class="toolbar-btn" data-action="fullscreen">
                         <i class="ri-fullscreen-line"></i>
                     </button>
                 </div>
                 <div class="toolbar-section">
-                    <button class="toolbar-btn" data-action="bold" data-tooltip="Bold">
+                    <button class="toolbar-btn" data-action="bold">
                         <i class="ri-bold"></i>
                     </button>
-                    <button class="toolbar-btn" data-action="italic" data-tooltip="Italic">
+                    <button class="toolbar-btn" data-action="italic">
                         <i class="ri-italic"></i>
                     </button>
-                    <button class="toolbar-btn" data-action="underline" data-tooltip="Underline">
+                    <button class="toolbar-btn" data-action="underline">
                         <i class="ri-underline"></i>
                     </button>
                 </div>
@@ -119,7 +119,7 @@
                 </div>
             </div>
             <div class="editor-container">
-                <div id="notepad" class="content-editable" contenteditable="true" spellcheck="true" placeholder="Start typing your notes here..."></div>
+                <textarea id="notepad" spellcheck="true" placeholder="Start typing your notes here..."></textarea>
             </div>
             <div class="status-bar">
                 <span id="charCount">0 characters</span>
