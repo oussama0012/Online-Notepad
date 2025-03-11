@@ -42,24 +42,16 @@ class NotepadApp {
             btn.addEventListener('click', () => this.handleToolbarAction(btn.dataset.action));
         });
 
-        this.colorPicker.addEventListener('input', (e) => {
-            const selection = window.getSelection();
-            if (selection.toString().length === 0) {
-                this.createToast('Select text to apply color', 'warning');
-                return;
-            }
-            document.execCommand('styleWithCSS', false, true);
-            document.execCommand('foreColor', false, e.target.value);
-            this.updateActiveButtons();
-            this.checkForChanges();
+        this.colorPicker.addEventListener('change', (e) => {
+            this.notepad.style.color = e.target.value;
         });
         
         this.fontSelector.addEventListener('change', (e) => {
-            document.execCommand('fontName', false, e.target.value);
+            this.notepad.style.fontFamily = e.target.value;
         });
         
         this.fontSizeSelector.addEventListener('change', (e) => {
-            document.execCommand('fontSize', false, e.target.value);
+            this.notepad.style.fontSize = e.target.value + 'px';
         });
 
         this.toggleSavedFilesBtn.addEventListener('click', () => {
@@ -139,9 +131,6 @@ class NotepadApp {
                 <div class="saved-file-preview">${note.content.substring(0, 120)}</div>
                 <div class="saved-file-date">${formattedDate}</div>
                 <div class="saved-file-actions">
-                    <button class="file-action-btn rename-note" data-note-id="${noteId}">
-                        <i class="ri-edit-line"></i>
-                    </button>
                     <button class="file-action-btn delete-note" data-note-id="${noteId}">
                         <i class="ri-delete-bin-line"></i>
                     </button>
@@ -149,8 +138,8 @@ class NotepadApp {
             `;
             
             noteCard.addEventListener('click', (e) => {
-                // Ignore clicks on the action buttons
-                if (!e.target.closest('.delete-note') && !e.target.closest('.rename-note')) {
+                // Ignore clicks on the delete button
+                if (!e.target.closest('.delete-note')) {
                     this.loadNote(noteId);
                 }
             });
@@ -164,15 +153,6 @@ class NotepadApp {
                 e.stopPropagation(); // Prevent card click
                 const noteId = btn.dataset.noteId;
                 this.deleteNote(noteId);
-            });
-        });
-        
-        // Add event listeners for rename buttons
-        document.querySelectorAll('.rename-note').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation(); // Prevent card click
-                const noteId = btn.dataset.noteId;
-                this.renameNote(noteId);
             });
         });
     }
@@ -231,99 +211,17 @@ class NotepadApp {
     }
 
     deleteNote(noteId) {
-        this.showDeleteConfirmation(noteId);
-    }
-
-    showDeleteConfirmation(noteId) {
-        const modal = document.createElement('div');
-        modal.className = 'delete-modal';
-        modal.innerHTML = `
-            <div class="delete-modal-content">
-                <h3>Confirm Delete</h3>
-                <p>Are you sure you want to delete this note?</p>
-                <div class="delete-modal-buttons">
-                    <button id="delete-confirm">Delete</button>
-                    <button id="delete-cancel">Cancel</button>
-                </div>
-            </div>
-        `;
-    
-        document.body.appendChild(modal);
-    
-        const confirmButton = modal.querySelector('#delete-confirm');
-        const cancelButton = modal.querySelector('#delete-cancel');
-    
-        confirmButton.addEventListener('click', () => {
-            this.actuallyDeleteNote(noteId);
-            document.body.removeChild(modal);
-        });
-    
-        cancelButton.addEventListener('click', () => {
-            document.body.removeChild(modal);
-        });
-    }
-
-    actuallyDeleteNote(noteId) {
-        delete this.savedNotes[noteId];
-        localStorage.setItem('savedNotes', JSON.stringify(this.savedNotes));
+        if (confirm('Are you sure you want to delete this note?')) {
+            delete this.savedNotes[noteId];
+            localStorage.setItem('savedNotes', JSON.stringify(this.savedNotes));
             
-        // If the deleted note was the current note, clear the editor
-        if (noteId === this.currentNoteId) {
-            this.createNewNote();
-        }
-            
-        this.renderSavedFiles();
-    }
-
-    renameNote(noteId) {
-        const note = this.savedNotes[noteId];
-        if (!note) return;
-    
-        this.showRenameDialog(noteId, note.title || 'Untitled Note');
-    }
-
-    showRenameDialog(noteId, currentTitle) {
-        const modal = document.createElement('div');
-        modal.className = 'rename-modal';
-        modal.innerHTML = `
-            <div class="rename-modal-content">
-                <h3>Rename Note</h3>
-                <p>Enter a new name for this note:</p>
-                <input type="text" id="rename-input" class="rename-modal-input" value="${currentTitle}">
-                <div class="rename-modal-buttons">
-                    <button id="rename-save">Save</button>
-                    <button id="rename-cancel">Cancel</button>
-                </div>
-            </div>
-        `;
-    
-        document.body.appendChild(modal);
-    
-        const renameInput = modal.querySelector('#rename-input');
-        renameInput.focus(); // Focus on the input field
-    
-        const saveButton = modal.querySelector('#rename-save');
-        const cancelButton = modal.querySelector('#rename-cancel');
-    
-        saveButton.addEventListener('click', () => {
-            const newTitle = renameInput.value.trim();
-            if (newTitle !== '') {
-                // Update the note title
-                const note = this.savedNotes[noteId];
-                if (note) {
-                    note.title = newTitle;
-                    note.lastModified = new Date().toISOString();
-                    localStorage.setItem('savedNotes', JSON.stringify(this.savedNotes));
-                    this.renderSavedFiles();
-                    this.createToast('Note renamed successfully!');
-                }
+            // If the deleted note was the current note, clear the editor
+            if (noteId === this.currentNoteId) {
+                this.createNewNote();
             }
-            document.body.removeChild(modal);
-        });
-    
-        cancelButton.addEventListener('click', () => {
-            document.body.removeChild(modal);
-        });
+            
+            this.renderSavedFiles();
+        }
     }
 
     checkForChanges() {
@@ -342,13 +240,13 @@ class NotepadApp {
                 this.downloadNote();
                 break;
             case 'bold':
-                this.toggleTextStyle('bold');
+                this.toggleTextStyle('fontWeight', 'bold', 'normal');
                 break;
             case 'italic':
-                this.toggleTextStyle('italic');
+                this.toggleTextStyle('fontStyle', 'italic', 'normal');
                 break;
             case 'underline':
-                this.toggleTextStyle('underline');
+                this.toggleTextStyle('textDecoration', 'underline', 'none');
                 break;
             case 'undo':
                 this.undo();
@@ -429,18 +327,22 @@ class NotepadApp {
         this.wordCount.textContent = `${words} words`;
     }
 
-    toggleTextStyle(action, value = null) {
-        document.execCommand(action, false, value);
-        this.updateActiveButtons();
-        this.checkForChanges();
-    }
-
-    updateActiveButtons() {
-        const actions = ['bold', 'italic', 'underline'];
-        actions.forEach(action => {
-            const btn = document.querySelector(`[data-action="${action}"]`);
-            btn.classList.toggle('active', document.queryCommandState(action));
-        });
+    toggleTextStyle(style, activeValue, defaultValue) {
+        const currentValue = this.notepad.style[style];
+        this.notepad.style[style] = 
+            currentValue === activeValue ? defaultValue : activeValue;
+            
+        // Update the active state of the button
+        const button = document.querySelector(`[data-action="${style === 'fontWeight' ? 'bold' : 
+                                             style === 'fontStyle' ? 'italic' : 
+                                             'underline'}"]`);
+        if (button) {
+            if (this.notepad.style[style] === activeValue) {
+                button.classList.add('active');
+            } else {
+                button.classList.remove('active');
+            }
+        }
     }
 
     clearNotepad() {
