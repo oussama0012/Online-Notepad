@@ -1,170 +1,135 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Online Notepad - Free Web-Based Text Editor</title>
-    <meta name="description" content="A free, professional online notepad that works in your browser. Create, edit, save and export text notes easily. No installation required.">
+    <title>Modern Notepad</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.snow.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.5.0-beta4/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://unpkg.com/docx@7.8.2/build/index.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 </head>
 <body>
-    <div class="app-container">
-        <!-- File Management Panel (Left Sidebar) -->
-        <div class="sidebar">
-            <div class="sidebar-header">
-                <button id="new-file-btn" class="btn primary-btn">
-                    <i class="fas fa-plus"></i> New File
-                </button>
-            </div>
-            <div class="file-list-container">
-                <h3>My Files</h3>
-                <ul id="file-list" class="file-list">
-                    <!-- Files will be listed here dynamically -->
-                </ul>
-            </div>
+    <div class="ad-container top-ad">
+        <div class="ad-placeholder">Advertisement</div>
+    </div>
+    <div class="saved-files-container" id="savedFilesContainer">
+        <div class="saved-files-header">
+            <h3>Saved Notes</h3>
+            <button id="toggleSavedFiles" class="toggle-saved-btn">
+                <i class="ri-arrow-up-s-line"></i>
+            </button>
         </div>
-
-        <!-- Main Content Area -->
-        <div class="main-content">
-            <!-- Title Section -->
-            <div class="header">
-                <div class="title">Online Notepad</div>
-                
-                <!-- Toolbar -->
-                <div class="toolbar">
-                    <div class="btn-group">
-                        <button id="open-file-btn" class="btn">
-                            <i class="fas fa-folder-open"></i> Open File
-                        </button>
-                        <button id="save-file-btn" class="btn primary-btn">
-                            <i class="fas fa-save"></i> Save
-                        </button>
-                    </div>
-                    <div class="btn-group">
-                        <div class="dropdown">
-                            <button id="export-file-btn" class="btn">
-                                <i class="fas fa-file-export"></i> Export
-                            </button>
-                            <div class="dropdown-content">
-                                <a href="#" id="export-txt"><i class="fas fa-file-alt"></i> Text File (.txt)</a>
-                                <a href="#" id="export-pdf"><i class="fas fa-file-pdf"></i> PDF File (.pdf)</a>
-                                <a href="#" id="export-docx"><i class="fas fa-file-word"></i> Word File (.docx)</a>
-                            </div>
-                        </div>
-                        <button id="rename-file-btn" class="btn">
-                            <i class="fas fa-edit"></i> Rename
-                        </button>
-                    </div>
-                    <div class="btn-group">
-                        <button id="delete-file-btn" class="btn danger-btn">
-                            <i class="fas fa-trash-alt"></i> Delete
-                        </button>
-                        <button id="fullscreen-btn" class="btn">
-                            <i class="fas fa-expand"></i> Fullscreen
-                        </button>
-                    </div>
+        <div class="saved-files-list" id="savedFilesList">
+            <!-- Saved files will be populated here -->
+        </div>
+    </div>
+    <div class="main-content">
+        <div class="notepad-container">
+            <div class="toolbar">
+                <div class="toolbar-section">
+                    <button class="toolbar-btn" data-action="new">
+                        <i class="ri-file-add-line"></i>
+                    </button>
+                    <button class="toolbar-btn" data-action="save">
+                        <i class="ri-save-line"></i>
+                    </button>
+                    <button class="toolbar-btn" data-action="download">
+                        <i class="ri-download-line"></i>
+                    </button>
+                    <button class="toolbar-btn" data-action="undo">
+                        <i class="ri-arrow-go-back-line"></i>
+                    </button>
+                    <button class="toolbar-btn" data-action="redo">
+                        <i class="ri-arrow-go-forward-line"></i>
+                    </button>
+                    <button class="toolbar-btn" data-action="fullscreen">
+                        <i class="ri-fullscreen-line"></i>
+                    </button>
+                </div>
+                <div class="toolbar-section">
+                    <button class="toolbar-btn" data-action="bold">
+                        <i class="ri-bold"></i>
+                    </button>
+                    <button class="toolbar-btn" data-action="italic">
+                        <i class="ri-italic"></i>
+                    </button>
+                    <button class="toolbar-btn" data-action="underline">
+                        <i class="ri-underline"></i>
+                    </button>
+                </div>
+                <div class="toolbar-section">
+                    <select id="fontSelector" class="font-selector">
+                        <option value="'Inter', sans-serif">Inter (Default)</option>
+                        <option value="'Arial', sans-serif">Arial</option>
+                        <option value="'Helvetica', sans-serif">Helvetica</option>
+                        <option value="'Times New Roman', serif">Times New Roman</option>
+                        <option value="'Georgia', serif">Georgia</option>
+                        <option value="'Courier New', monospace">Courier New</option>
+                        <option value="'Verdana', sans-serif">Verdana</option>
+                        <option value="'Tahoma', sans-serif">Tahoma</option>
+                        <option value="'Trebuchet MS', sans-serif">Trebuchet MS</option>
+                        <option value="'Arial Black', sans-serif">Arial Black</option>
+                        <option value="'Impact', sans-serif">Impact</option>
+                        <option value="'Comic Sans MS', cursive">Comic Sans MS</option>
+                        <option value="'Garamond', serif">Garamond</option>
+                        <option value="'Palatino', serif">Palatino</option>
+                        <option value="'Bookman', serif">Bookman</option>
+                        <option value="'Avant Garde', sans-serif">Avant Garde</option>
+                        <option value="'Century Gothic', sans-serif">Century Gothic</option>
+                        <option value="'Copperplate', fantasy">Copperplate</option>
+                        <option value="'Monaco', monospace">Monaco</option>
+                        <option value="'Consolas', monospace">Consolas</option>
+                        <option value="'Lucida Console', monospace">Lucida Console</option>
+                        <option value="'Brush Script MT', cursive">Brush Script MT</option>
+                        <option value="'Lucida Handwriting', cursive">Lucida Handwriting</option>
+                        <option value="'Segoe UI', sans-serif">Segoe UI</option>
+                        <option value="'Calibri', sans-serif">Calibri</option>
+                        <option value="'Cambria', serif">Cambria</option>
+                        <option value="'Open Sans', sans-serif">Open Sans</option>
+                        <option value="'Roboto', sans-serif">Roboto</option>
+                        <option value="'Lato', sans-serif">Lato</option>
+                        <option value="'Montserrat', sans-serif">Montserrat</option>
+                        <option value="'Oswald', sans-serif">Oswald</option>
+                        <option value="'Playfair Display', serif">Playfair Display</option>
+                    </select>
+                </div>
+                <div class="toolbar-section">
+                    <select id="fontSizeSelector" class="font-size-selector">
+                        <option value="12">12px</option>
+                        <option value="14">14px</option>
+                        <option value="16">16px</option>
+                        <option value="18">18px</option>
+                        <option value="19" selected>19px</option>
+                        <option value="20">20px</option>
+                        <option value="22">22px</option>
+                        <option value="24">24px</option>
+                        <option value="26">26px</option>
+                        <option value="28">28px</option>
+                        <option value="32">32px</option>
+                        <option value="36">36px</option>
+                        <option value="42">42px</option>
+                        <option value="48">48px</option>
+                        <option value="56">56px</option>
+                        <option value="64">64px</option>
+                        <option value="72">72px</option>
+                    </select>
+                </div>
+                <div class="toolbar-section">
+                    <input type="color" class="color-picker" id="textColorPicker">
+                    <label for="textColorPicker" class="toolbar-btn">
+                        <i class="ri-font-color"></i>
+                    </label>
                 </div>
             </div>
-
-            <!-- Ad Banner 1 -->
-            <div class="ad-banner">
-                <div class="ad-placeholder">
-                    Advertisement Space
-                </div>
-            </div>
-
-            <!-- Editor Section -->
             <div class="editor-container">
-                <div class="filename-container">
-                    <input type="text" id="file-name" placeholder="Untitled Document" class="filename-input">
-                    <span id="word-count" class="word-count">0 words</span>
-                </div>
-                <div id="editor"></div>
+                <textarea id="notepad" spellcheck="true" placeholder="Start typing your notes here..."></textarea>
             </div>
-
-            <!-- Ad Banner 2 -->
-            <div class="ad-banner">
-                <div class="ad-placeholder">
-                    Advertisement Space
-                </div>
-            </div>
-
-            <!-- SEO Article Section -->
-            <div class="seo-article">
-                <h2>Online Notepad: The Ultimate Free Text Editor for Your Browser</h2>
-                <p>Our Online Notepad provides a seamless, intuitive text editing experience directly in your web browser. No downloads, no installations—just pure productivity at your fingertips.</p>
-                
-                <h3>Features That Make Our Online Notepad Stand Out</h3>
-                <p>Whether you're jotting down quick thoughts, drafting an important document, or storing information for later, our notepad offers all the functionality you need:</p>
-                <ul>
-                    <li><strong>Instant Access:</strong> Works on any device with a browser—no software installation required</li>
-                    <li><strong>Rich Text Formatting:</strong> Bold, italic, underline, lists, and more to organize your thoughts</li>
-                    <li><strong>Cloud Saving:</strong> Never lose your work with automatic saving to your browser</li>
-                    <li><strong>Export Options:</strong> Download your notes as TXT, PDF, or DOCX files</li>
-                    <li><strong>Clean Interface:</strong> Distraction-free writing environment</li>
-                    <li><strong>File Management:</strong> Create, save, and organize multiple documents</li>
-                </ul>
-                
-                <h3>Why Use an Online Notepad?</h3>
-                <p>In today's fast-paced digital world, having a reliable online notepad offers numerous advantages:</p>
-                <ol>
-                    <li><strong>Accessibility:</strong> Access your notes from anywhere, on any device</li>
-                    <li><strong>Convenience:</strong> No need to search for a pen and paper or open heavy applications</li>
-                    <li><strong>Organization:</strong> Keep all your notes in one central location</li>
-                    <li><strong>Environmentally Friendly:</strong> Reduce paper waste by taking notes digitally</li>
-                    <li><strong>Sharing Capabilities:</strong> Easily export and share your notes with others</li>
-                </ol>
-                
-                <h3>Boosting Your Productivity with Online Notes</h3>
-                <p>Our free online notepad is more than just a text editor—it's a productivity tool designed to streamline your workflow:</p>
-                <ul>
-                    <li>Capture ideas instantly when inspiration strikes</li>
-                    <li>Keep track of to-do lists and important information</li>
-                    <li>Draft content before transferring to other platforms</li>
-                    <li>Store code snippets, recipes, or any text you need to reference later</li>
-                    <li>Access your notes across multiple devices without synchronization issues</li>
-                </ul>
-                
-                <p>Experience the freedom and flexibility of our browser-based notepad today. Whether for work, study, or personal use, our online text editor provides a reliable solution for all your note-taking needs—completely free and without registration.</p>
-            </div>
-
-            <!-- Footer -->
-            <footer class="footer">
-                <p>&copy; 2023 Online Notepad. All rights reserved.</p>
-            </footer>
-        </div>
-    </div>
-
-    <!-- Modals -->
-    <div id="rename-modal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h3>Rename File</h3>
-            <input type="text" id="rename-input" placeholder="New filename">
-            <div class="modal-buttons">
-                <button id="rename-cancel" class="btn">Cancel</button>
-                <button id="rename-confirm" class="btn primary-btn">Rename</button>
+            <div class="status-bar">
+                <span id="charCount">0 characters</span>
+                <span id="wordCount">0 words</span>
             </div>
         </div>
     </div>
-
-    <div id="delete-modal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h3>Delete File</h3>
-            <p>Are you sure you want to delete this file? This action cannot be undone.</p>
-            <div class="modal-buttons">
-                <button id="delete-cancel" class="btn">Cancel</button>
-                <button id="delete-confirm" class="btn danger-btn">Delete</button>
-            </div>
-        </div>
+    <div class="ad-container bottom-ad">
+        <div class="ad-placeholder">Advertisement</div>
     </div>
-
-    <script src="app.js"></script>
+    <script src="app.js" type="module"></script>
 </body>
 </html>
