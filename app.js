@@ -12,41 +12,19 @@ class NotepadApp {
         this.toggleSavedFilesBtn = document.getElementById('toggleSavedFiles');
         this.hasUnsavedChanges = false;
         this.savedContent = '';
-        this.undoStack = [];
+        this.undoStack = [this.notepad.innerHTML]; 
         this.redoStack = [];
         this.lastSavedState = '';
         this.isUndoRedo = false;
         this.currentNoteId = null;
         this.savedNotes = {};
 
-        // Convert textarea to contenteditable div for rich text support
-        this.setupRichTextEditor();
         this.setupEventListeners();
         this.loadSavedNotes();
         this.renderSavedFiles();
         
         // Initialize toggle button as collapsed
         this.toggleSavedFilesBtn.classList.add('collapsed');
-    }
-
-    setupRichTextEditor() {
-        // Create a contenteditable div to replace the textarea
-        const textareaParent = this.notepad.parentNode;
-        const editorDiv = document.createElement('div');
-        editorDiv.setAttribute('contenteditable', 'true');
-        editorDiv.setAttribute('id', 'rich-notepad');
-        editorDiv.className = this.notepad.className;
-        editorDiv.style.minHeight = '200px';
-        editorDiv.style.overflow = 'auto';
-        editorDiv.style.outline = 'none';
-        editorDiv.style.whiteSpace = 'pre-wrap';
-        
-        // Replace textarea with contenteditable div
-        textareaParent.replaceChild(editorDiv, this.notepad);
-        this.notepad = editorDiv;
-        
-        // Setup initial undo state
-        this.undoStack.push(this.notepad.innerHTML);
     }
 
     setupEventListeners() {
@@ -60,84 +38,24 @@ class NotepadApp {
             this.checkForChanges();
         });
         
-        // Important: Store selection state when clicking outside the editor
-        document.addEventListener('mouseup', () => {
-            if (window.getSelection && window.getSelection().rangeCount > 0) {
-                const selection = window.getSelection();
-                if (this.notepad.contains(selection.anchorNode)) {
-                    this.lastSelection = {
-                        startOffset: selection.anchorOffset,
-                        endOffset: selection.focusOffset,
-                        startNode: selection.anchorNode,
-                        endNode: selection.focusNode
-                    };
-                }
-            }
-        });
-        
         this.toolbarBtns.forEach(btn => {
             btn.addEventListener('click', () => this.handleToolbarAction(btn.dataset.action));
         });
 
         this.colorPicker.addEventListener('change', (e) => {
-            this.applyFormatting('foreColor', e.target.value);
+            this.notepad.style.color = e.target.value;
         });
         
         this.fontSelector.addEventListener('change', (e) => {
-            this.applyFormatting('fontName', e.target.value);
+            this.notepad.style.fontFamily = e.target.value;
         });
         
         this.fontSizeSelector.addEventListener('change', (e) => {
-            // Convert px value to font size (1-7)
-            const sizeValue = parseInt(e.target.value);
-            
-            // Map pixel values to fontSize command values (1-7)
-            let fontSizeValue;
-            if (sizeValue <= 10) fontSizeValue = 1;
-            else if (sizeValue <= 13) fontSizeValue = 2;
-            else if (sizeValue <= 16) fontSizeValue = 3;
-            else if (sizeValue <= 18) fontSizeValue = 4;
-            else if (sizeValue <= 24) fontSizeValue = 5;
-            else if (sizeValue <= 32) fontSizeValue = 6;
-            else fontSizeValue = 7;
-            
-            this.applyFormatting('fontSize', fontSizeValue);
+            this.notepad.style.fontSize = e.target.value + 'px';
         });
 
         this.toggleSavedFilesBtn.addEventListener('click', () => {
             this.toggleSavedFilesPanel();
-        });
-        
-        // Add support for keyboard shortcuts
-        document.addEventListener('keydown', (e) => {
-            if (e.ctrlKey) {
-                switch (e.key.toLowerCase()) {
-                    case 'b':
-                        e.preventDefault();
-                        this.handleToolbarAction('bold');
-                        break;
-                    case 'i':
-                        e.preventDefault();
-                        this.handleToolbarAction('italic');
-                        break;
-                    case 'u':
-                        e.preventDefault();
-                        this.handleToolbarAction('underline');
-                        break;
-                    case 's':
-                        e.preventDefault();
-                        this.handleToolbarAction('save');
-                        break;
-                    case 'z':
-                        e.preventDefault();
-                        this.handleToolbarAction('undo');
-                        break;
-                    case 'y':
-                        e.preventDefault();
-                        this.handleToolbarAction('redo');
-                        break;
-                }
-            }
         });
     }
 
@@ -145,7 +63,7 @@ class NotepadApp {
         const filesList = this.savedFilesList;
         const toggleBtn = this.toggleSavedFilesBtn;
         
-        if (filesList.style.display === 'none') {
+        if (filesList.style.display === 'none' || filesList.style.display === '') {
             filesList.style.display = 'flex';
             toggleBtn.classList.remove('collapsed');
         } else {
@@ -208,16 +126,14 @@ class NotepadApp {
             
             const formattedDate = this.formatDate(new Date(note.lastModified));
             
-            // Extract text content for preview, stripping HTML tags
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = note.content;
-            const textContent = tempDiv.textContent || tempDiv.innerText || '';
-            
             noteCard.innerHTML = `
                 <div class="saved-file-title">${note.title || 'Untitled Note'}</div>
-                <div class="saved-file-preview">${textContent.substring(0, 120)}</div>
+                <div class="saved-file-preview">${note.content.substring(0, 120)}</div>
                 <div class="saved-file-date">${formattedDate}</div>
                 <div class="saved-file-actions">
+                    <button class="file-action-btn rename-note" data-note-id="${noteId}">
+                        <i class="ri-edit-line"></i>
+                    </button>
                     <button class="file-action-btn delete-note" data-note-id="${noteId}">
                         <i class="ri-delete-bin-line"></i>
                     </button>
@@ -225,8 +141,8 @@ class NotepadApp {
             `;
             
             noteCard.addEventListener('click', (e) => {
-                // Ignore clicks on the delete button
-                if (!e.target.closest('.delete-note')) {
+                // Ignore clicks on action buttons
+                if (!e.target.closest('.delete-note') && !e.target.closest('.rename-note')) {
                     this.loadNote(noteId);
                 }
             });
@@ -242,6 +158,70 @@ class NotepadApp {
                 this.deleteNote(noteId);
             });
         });
+
+        // Add event listeners for rename buttons
+        document.querySelectorAll('.rename-note').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent card click
+                const noteId = btn.dataset.noteId;
+                this.showRenameDialog(noteId);
+            });
+        });
+    }
+    
+    showRenameDialog(noteId) {
+        const note = this.savedNotes[noteId];
+        if (!note) return;
+        
+        const modal = document.createElement('div');
+        modal.className = 'save-modal';
+        modal.innerHTML = `
+            <div class="save-modal-content rename-modal">
+                <h3>Rename Note</h3>
+                <input type="text" id="rename-input" value="${note.title || 'Untitled Note'}" 
+                    class="rename-input" placeholder="Enter a new name">
+                <div class="save-modal-buttons rename-buttons">
+                    <button id="modal-rename">Rename</button>
+                    <button id="modal-cancel-rename">Cancel</button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        // Focus the input field
+        const renameInput = document.getElementById('rename-input');
+        renameInput.focus();
+        renameInput.select();
+        
+        // Add event listeners
+        document.getElementById('modal-rename').addEventListener('click', () => {
+            const newTitle = renameInput.value.trim() || 'Untitled Note';
+            this.renameNote(noteId, newTitle);
+            document.body.removeChild(modal);
+        });
+        
+        document.getElementById('modal-cancel-rename').addEventListener('click', () => {
+            document.body.removeChild(modal);
+        });
+        
+        // Handle Enter key press
+        renameInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const newTitle = renameInput.value.trim() || 'Untitled Note';
+                this.renameNote(noteId, newTitle);
+                document.body.removeChild(modal);
+            }
+        });
+    }
+    
+    renameNote(noteId, newTitle) {
+        if (this.savedNotes[noteId]) {
+            this.savedNotes[noteId].title = newTitle;
+            localStorage.setItem('savedNotes', JSON.stringify(this.savedNotes));
+            this.renderSavedFiles();
+            this.createToast('Note renamed successfully!');
+        }
     }
 
     formatDate(date) {
@@ -264,12 +244,7 @@ class NotepadApp {
 
     generateTitle(content) {
         // Extract first line or first few words as title
-        // For HTML content, extract just the text
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = content;
-        const textContent = tempDiv.textContent || tempDiv.innerText || '';
-        const firstLine = textContent.split('\n')[0].trim();
-        
+        const firstLine = content.split('\n')[0].trim();
         if (firstLine.length > 0) {
             return firstLine.length > 30 ? firstLine.substring(0, 30) + '...' : firstLine;
         }
@@ -294,8 +269,6 @@ class NotepadApp {
             this.currentNoteId = noteId;
             this.hasUnsavedChanges = false;
             this.updateStats();
-            
-            // Reset undo/redo stacks but keep the current state
             this.undoStack = [note.content];
             this.redoStack = [];
             
@@ -334,13 +307,13 @@ class NotepadApp {
                 this.downloadNote();
                 break;
             case 'bold':
-                this.applyFormatting('bold');
+                document.execCommand('bold', false, null);
                 break;
             case 'italic':
-                this.applyFormatting('italic');
+                document.execCommand('italic', false, null);
                 break;
             case 'underline':
-                this.applyFormatting('underline');
+                document.execCommand('underline', false, null);
                 break;
             case 'undo':
                 this.undo();
@@ -352,58 +325,6 @@ class NotepadApp {
                 this.toggleFullscreen();
                 break;
         }
-    }
-
-    applyFormatting(command, value = null) {
-        // Focus on the editor to ensure commands apply properly
-        this.notepad.focus();
-        
-        // Check if there's a selection
-        const selection = window.getSelection();
-        const hasSelection = selection.toString().length > 0;
-        
-        // If there's no selection, try to use last known selection
-        if (!hasSelection && this.lastSelection) {
-            try {
-                const range = document.createRange();
-                range.setStart(this.lastSelection.startNode, this.lastSelection.startOffset);
-                range.setEnd(this.lastSelection.endNode, this.lastSelection.endOffset);
-                selection.removeAllRanges();
-                selection.addRange(range);
-            } catch (e) {
-                console.log("Couldn't restore selection");
-            }
-        }
-        
-        // Apply the formatting command
-        document.execCommand(command, false, value);
-        
-        // After applying formatting, save to the undo stack
-        if (!this.isUndoRedo) {
-            this.undoStack.push(this.notepad.innerHTML);
-            this.redoStack = [];
-        }
-        
-        // Update formatting button states
-        this.updateFormatButtonStates();
-        
-        // Check for changes
-        this.checkForChanges();
-    }
-    
-    updateFormatButtonStates() {
-        // Update button active states based on current selection format
-        const isBold = document.queryCommandState('bold');
-        const isItalic = document.queryCommandState('italic');
-        const isUnderline = document.queryCommandState('underline');
-        
-        const boldBtn = document.querySelector('[data-action="bold"]');
-        const italicBtn = document.querySelector('[data-action="italic"]');
-        const underlineBtn = document.querySelector('[data-action="underline"]');
-        
-        if (boldBtn) boldBtn.classList.toggle('active', isBold);
-        if (italicBtn) italicBtn.classList.toggle('active', isItalic);
-        if (underlineBtn) underlineBtn.classList.toggle('active', isUnderline);
     }
 
     createNewNote() {
@@ -465,10 +386,9 @@ class NotepadApp {
     }
 
     updateStats() {
-        // Get text without HTML tags for counting
-        const textContent = this.notepad.textContent || this.notepad.innerText || '';
-        const chars = textContent.length;
-        const words = textContent.trim().split(/\s+/).filter(word => word.length > 0).length;
+        const text = this.notepad.innerText;
+        const chars = text.length;
+        const words = text.trim().split(/\s+/).filter(word => word.length > 0).length;
 
         this.charCount.textContent = `${chars} characters`;
         this.wordCount.textContent = `${words} words`;
@@ -480,10 +400,6 @@ class NotepadApp {
         this.savedContent = '';
         this.hasUnsavedChanges = false;
         this.currentNoteId = null;
-        
-        // Reset undo/redo stacks but keep the empty state
-        this.undoStack = [''];
-        this.redoStack = [];
     }
 
     createToast(message, type = 'success') {
@@ -519,7 +435,7 @@ class NotepadApp {
 
     saveNote() {
         const content = this.notepad.innerHTML;
-        const title = this.generateTitle(content);
+        const title = this.generateTitle(this.notepad.innerText);
         const lastModified = new Date().toISOString();
         
         // Create a new note or update existing one
@@ -543,209 +459,224 @@ class NotepadApp {
     }
 
     downloadNote() {
-        // For HTML content, offer option to download as HTML or plain text
-        const htmlContent = this.notepad.innerHTML;
-        const textContent = this.notepad.textContent || this.notepad.innerText || '';
+        this.showDownloadFormatDialog().then(fileFormat => {
+            if (!fileFormat) return; // User cancelled
+            
+            // Handle PDF and DOCX differently
+            if (fileFormat === 'pdf') {
+                this.createPDF();
+                return;
+            }
+            
+            if (fileFormat === 'docx') {
+                this.createDOCX();
+                return;
+            }
+            
+            let mimeType, extension;
+            switch(fileFormat) {
+                case 'txt':
+                    mimeType = 'text/plain';
+                    extension = 'txt';
+                    break;
+                case 'html':
+                    mimeType = 'text/html';
+                    extension = 'html';
+                    break;
+                case 'md':
+                    mimeType = 'text/markdown';
+                    extension = 'md';
+                    break;
+                case 'rtf':
+                    mimeType = 'application/rtf';
+                    extension = 'rtf';
+                    break;
+                default:
+                    mimeType = 'text/plain';
+                    extension = 'txt';
+            }
+            
+            const content = fileFormat === 'html' ? this.notepad.innerHTML : this.notepad.innerText;
+            const blob = new Blob([content], {type: mimeType});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `note.${extension}`;
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+    }
+    
+    createPDF() {
+        const htmlContent = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <title>Notepad Export</title>
+                <style>
+                    body { font-family: ${this.notepad.style.fontFamily || 'Arial'}; font-size: ${this.notepad.style.fontSize || '16px'}; }
+                </style>
+            </head>
+            <body>
+                <div style="white-space: pre-wrap;">${this.notepad.innerHTML}</div>
+            </body>
+            </html>
+        `;
         
-        // Create HTML blob
         const blob = new Blob([htmlContent], {type: 'text/html'});
         const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'note.html';
-        a.click();
-        URL.revokeObjectURL(url);
         
-        // Also offer plain text option
-        const textBlob = new Blob([textContent], {type: 'text/plain'});
-        const textUrl = URL.createObjectURL(textBlob);
-        const textA = document.createElement('a');
-        textA.href = textUrl;
-        textA.download = 'note.txt';
+        // Use html2pdf library to convert and download
+        const script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+        document.body.appendChild(script);
         
-        // Show option dialog
+        script.onload = () => {
+            const element = document.createElement('div');
+            element.innerHTML = this.notepad.innerHTML;
+            document.body.appendChild(element);
+            
+            const opt = {
+                margin: [0.5, 0.5, 0.5, 0.5],
+                filename: 'note.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+            
+            html2pdf().from(element).set(opt).save().then(() => {
+                document.body.removeChild(element);
+                document.body.removeChild(script);
+                this.createToast('PDF downloaded successfully!', 'success');
+            });
+        };
+    }
+    
+    createDOCX() {
+        const script = document.createElement('script');
+        script.src = 'https://unpkg.com/docx@7.1.0/build/index.js';
+        document.body.appendChild(script);
+        
+        script.onload = () => {
+            const { Document, Packer, Paragraph, TextRun } = docx;
+            
+            const paragraphs = this.notepad.innerText.split('\n').map(line => {
+                return new Paragraph({
+                    children: [new TextRun(line)]
+                });
+            });
+            
+            const doc = new Document({
+                sections: [{
+                    properties: {},
+                    children: paragraphs
+                }]
+            });
+            
+            // Generate and download the document
+            Packer.toBlob(doc).then(blob => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'note.docx';
+                a.click();
+                URL.revokeObjectURL(url);
+                document.body.removeChild(script);
+                this.createToast('DOCX downloaded successfully!', 'success');
+            });
+        };
+    }
+
+    showDownloadFormatDialog() {
+        const formats = [
+            { id: 'txt', name: 'Text (.txt)', icon: 'ri-file-text-line' },
+            { id: 'html', name: 'HTML (.html)', icon: 'ri-html5-line' },
+            { id: 'md', name: 'Markdown (.md)', icon: 'ri-markdown-line' },
+            { id: 'rtf', name: 'Rich Text (.rtf)', icon: 'ri-file-word-line' },
+            { id: 'docx', name: 'Word (.docx)', icon: 'ri-file-word-2-line' },
+            { id: 'pdf', name: 'PDF (.pdf)', icon: 'ri-file-pdf-line' }
+        ];
+        
         const modal = document.createElement('div');
-        modal.className = 'download-modal';
+        modal.className = 'save-modal';
         modal.innerHTML = `
-            <div class="download-modal-content">
-                <h3>Download Format</h3>
-                <p>Choose a format to download:</p>
-                <div class="download-modal-buttons">
-                    <button id="download-html">HTML (with formatting)</button>
-                    <button id="download-text">Plain Text</button>
-                    <button id="download-cancel">Cancel</button>
+            <div class="save-modal-content download-format-modal">
+                <h3>Choose File Format</h3>
+                <div class="format-options horizontal">
+                    ${formats.map(format => `
+                        <div class="format-option" data-format="${format.id}">
+                            <i class="${format.icon}"></i>
+                            <span>${format.name}</span>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="save-modal-buttons">
+                    <button id="modal-cancel-download">Cancel</button>
                 </div>
             </div>
         `;
         
         document.body.appendChild(modal);
         
-        document.getElementById('download-html').addEventListener('click', () => {
-            a.click();
-            document.body.removeChild(modal);
-        });
-        
-        document.getElementById('download-text').addEventListener('click', () => {
-            textA.click();
-            document.body.removeChild(modal);
-        });
-        
-        document.getElementById('download-cancel').addEventListener('click', () => {
-            document.body.removeChild(modal);
+        return new Promise(resolve => {
+            // Add event listeners for format options
+            document.querySelectorAll('.format-option').forEach(option => {
+                option.addEventListener('click', () => {
+                    const format = option.dataset.format;
+                    document.body.removeChild(modal);
+                    resolve(format);
+                });
+            });
+            
+            // Cancel button
+            document.getElementById('modal-cancel-download').addEventListener('click', () => {
+                document.body.removeChild(modal);
+                resolve(null);
+            });
         });
     }
 
     undo() {
-        // Check if undo stack has more than one item (keep at least initial state)
-        if (this.undoStack.length > 1) {
-            // Save current state to redo stack
+        if (this.undoStack.length > 1) { 
+            this.undoStack.pop(); 
+            const previousState = this.undoStack[this.undoStack.length - 1]; 
+            
             this.redoStack.push(this.notepad.innerHTML);
             
-            // Remove current state from undo stack
-            this.undoStack.pop();
-            
-            // Get previous state
-            const previousState = this.undoStack[this.undoStack.length - 1];
-            
-            // Set the flag to prevent adding to undo stack
             this.isUndoRedo = true;
             
-            // Apply the previous state
             this.notepad.innerHTML = previousState;
             this.updateStats();
             this.checkForChanges();
-            
-            // Feedback to user
-            this.createToast('Undo successful', 'info');
-        } else {
-            this.createToast('Nothing to undo', 'info');
         }
     }
 
     redo() {
         if (this.redoStack.length > 0) {
-            // Get next state from redo stack
+            this.undoStack.push(this.notepad.innerHTML);
+            
             const nextState = this.redoStack.pop();
             
-            // Save current state to undo stack
-            this.undoStack.push(nextState);
-            
-            // Set the flag to prevent adding to undo stack
             this.isUndoRedo = true;
             
-            // Apply the next state
             this.notepad.innerHTML = nextState;
             this.updateStats();
             this.checkForChanges();
-            
-            // Feedback to user
-            this.createToast('Redo successful', 'info');
-        } else {
-            this.createToast('Nothing to redo', 'info');
         }
     }
 
     toggleFullscreen() {
         const container = document.querySelector('.notepad-container');
         
-        // Use fullscreenElement to check if already in fullscreen
         if (document.fullscreenElement) {
-            // Exit fullscreen
-            document.exitFullscreen()
-              .then(() => {
-                  this.updateFullscreenButton(false);
-              })
-              .catch(err => {
-                  this.createToast(`Error exiting fullscreen: ${err.message}`, 'error');
-              });
-        } else {
-            // Alternative approach using iframe for browser-only fullscreen
-            if (!this.fullscreenFrame) {
-                // Create fullscreen container
-                const fullscreenContainer = document.createElement('div');
-                fullscreenContainer.className = 'browser-fullscreen';
-                fullscreenContainer.style.position = 'fixed';
-                fullscreenContainer.style.top = '0';
-                fullscreenContainer.style.left = '0';
-                fullscreenContainer.style.width = '100%';
-                fullscreenContainer.style.height = '100%';
-                fullscreenContainer.style.backgroundColor = 'var(--bg-primary)';
-                fullscreenContainer.style.zIndex = '9999';
-                fullscreenContainer.style.display = 'flex';
-                fullscreenContainer.style.flexDirection = 'column';
-                
-                // Clone the toolbar and editor
-                const toolbar = document.querySelector('.toolbar').cloneNode(true);
-                const editor = this.notepad.cloneNode(true);
-                editor.style.flex = '1';
-                editor.style.height = 'auto';
-                
-                // Add exit button
-                const exitBtn = document.createElement('button');
-                exitBtn.className = 'toolbar-btn';
-                exitBtn.innerHTML = '<i class="ri-fullscreen-exit-line"></i> Exit Fullscreen';
-                exitBtn.style.marginLeft = 'auto';
-                exitBtn.onclick = () => this.exitBrowserFullscreen();
-                
-                toolbar.appendChild(exitBtn);
-                fullscreenContainer.appendChild(toolbar);
-                fullscreenContainer.appendChild(editor);
-                
-                document.body.appendChild(fullscreenContainer);
-                this.fullscreenFrame = fullscreenContainer;
-                this.fullscreenEditor = editor;
-                
-                // Sync content
-                this.fullscreenEditor.innerHTML = this.notepad.innerHTML;
-                
-                // Setup events for fullscreen editor
-                this.fullscreenEditor.addEventListener('input', () => {
-                    this.notepad.innerHTML = this.fullscreenEditor.innerHTML;
-                    if (!this.isUndoRedo) {
-                        this.undoStack.push(this.notepad.innerHTML);
-                        this.redoStack = [];
-                    }
-                    this.isUndoRedo = false;
-                    this.updateStats();
-                    this.checkForChanges();
-                });
-                
-                // Setup toolbar buttons
-                const fullscreenToolbarBtns = this.fullscreenFrame.querySelectorAll('.toolbar-btn');
-                fullscreenToolbarBtns.forEach(btn => {
-                    if (btn.dataset.action) {
-                        btn.addEventListener('click', () => {
-                            // Special handling for fullscreen button
-                            if (btn.dataset.action === 'fullscreen') {
-                                this.exitBrowserFullscreen();
-                            } else {
-                                this.handleToolbarAction(btn.dataset.action);
-                                // Sync content after action
-                                this.fullscreenEditor.innerHTML = this.notepad.innerHTML;
-                            }
-                        });
-                    }
-                });
-                
-                // Focus the editor
-                this.fullscreenEditor.focus();
-                
-                this.updateFullscreenButton(true);
-            }
-        }
-    }
-    
-    exitBrowserFullscreen() {
-        if (this.fullscreenFrame) {
-            // Sync content back to main editor
-            this.notepad.innerHTML = this.fullscreenEditor.innerHTML;
-            
-            // Remove the fullscreen frame
-            document.body.removeChild(this.fullscreenFrame);
-            this.fullscreenFrame = null;
-            this.fullscreenEditor = null;
-            
+            document.exitFullscreen();
             this.updateFullscreenButton(false);
+        } else {
+            container.requestFullscreen().catch(err => {
+                this.createToast(`Error: ${err.message}`, 'error');
+            });
+            this.updateFullscreenButton(true);
         }
     }
 
@@ -764,34 +695,5 @@ class NotepadApp {
         }
     }
 }
-
-// Add missing CSS for browser fullscreen mode
-const style = document.createElement('style');
-style.textContent = `
-.browser-fullscreen .toolbar {
-    padding: 10px;
-    display: flex;
-    background-color: var(--bg-secondary);
-    border-bottom: 1px solid var(--border-color);
-}
-
-.browser-fullscreen [contenteditable="true"] {
-    padding: 15px;
-    font-family: inherit;
-    font-size: inherit;
-    color: inherit;
-    background-color: var(--bg-primary);
-    border: none;
-    resize: none;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-/* Added styles for font size display */
-[style*="font-size"] {
-    line-height: 1.4;
-}
-`;
-document.head.appendChild(style);
 
 new NotepadApp();
