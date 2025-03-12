@@ -9,7 +9,7 @@ class NotepadApp {
         this.toggleSavedFilesBtn = document.getElementById('toggleSavedFiles');
         this.hasUnsavedChanges = false;
         this.savedContent = '';
-        this.undoStack = [this.notepad.innerHTML]; 
+        this.undoStack = [];  
         this.redoStack = [];
         this.lastSavedState = '';
         this.isUndoRedo = false;
@@ -29,6 +29,9 @@ class NotepadApp {
         
         // Initialize toggle button as collapsed
         this.toggleSavedFilesBtn.classList.add('collapsed');
+
+        // Initialize undo stack with current content (which might be empty)
+        this.undoStack.push(this.notepad.innerHTML);
     }
 
     setupEventListeners() {
@@ -646,30 +649,44 @@ class NotepadApp {
 
     undo() {
         if (this.undoStack.length > 1) { 
-            this.undoStack.pop(); 
-            const previousState = this.undoStack[this.undoStack.length - 1]; 
-            
+            // Save current state to redo stack before going back
             this.redoStack.push(this.notepad.innerHTML);
+            
+            // Remove current state from undo stack
+            this.undoStack.pop(); 
+            
+            // Get the previous state
+            const previousState = this.undoStack[this.undoStack.length - 1]; 
             
             this.isUndoRedo = true;
             
+            // Apply the previous state to the notepad
             this.notepad.innerHTML = previousState;
             this.updateStats();
             this.checkForChanges();
+            
+            // Ensure focus remains in the editor
+            this.notepad.focus();
         }
     }
 
     redo() {
         if (this.redoStack.length > 0) {
+            // Save current state to undo stack
             this.undoStack.push(this.notepad.innerHTML);
             
+            // Get the next state from redo stack
             const nextState = this.redoStack.pop();
             
             this.isUndoRedo = true;
             
+            // Apply the next state to the notepad
             this.notepad.innerHTML = nextState;
             this.updateStats();
             this.checkForChanges();
+            
+            // Ensure focus remains in the editor
+            this.notepad.focus();
         }
     }
 
@@ -750,30 +767,34 @@ class NotepadApp {
                 return;
             }
             
-            let mimeType, extension;
+            let mimeType, extension, content;
             switch(fileFormat) {
                 case 'txt':
                     mimeType = 'text/plain';
                     extension = 'txt';
+                    content = this.notepad.innerText;
                     break;
                 case 'html':
                     mimeType = 'text/html';
                     extension = 'html';
+                    content = this.notepad.innerHTML;
                     break;
                 case 'md':
                     mimeType = 'text/markdown';
                     extension = 'md';
+                    content = this.notepad.innerText;
                     break;
                 case 'rtf':
                     mimeType = 'application/rtf';
                     extension = 'rtf';
+                    content = this.createRTFContent();
                     break;
                 default:
                     mimeType = 'text/plain';
                     extension = 'txt';
+                    content = this.notepad.innerText;
             }
             
-            const content = fileFormat === 'html' ? this.notepad.innerHTML : this.notepad.innerText;
             const blob = new Blob([content], {type: mimeType});
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -784,6 +805,21 @@ class NotepadApp {
         });
     }
     
+    createRTFContent() {
+        // Basic RTF header
+        let rtfContent = "{\\rtf1\\ansi\\ansicpg1252\\cocoartf2580\\cocoasubrtf220\n";
+        rtfContent += "{\\fonttbl\\f0\\fswiss\\fcharset0 Helvetica;}\n";
+        rtfContent += "{\\colortbl;\\red0\\green0\\blue0;}\n";
+        rtfContent += "\\margl1440\\margr1440\\vieww10800\\viewh8400\\viewkind0\n";
+        rtfContent += "\\pard\\tx720\\tx1440\\tx2160\\tx2880\\tx3600\\tx4320\\tx5040\\tx5760\\tx6480\\tx7200\\tx7920\\tx8640\\pardirnatural\\partightenfactor0\n\n";
+        
+        // Get text with preserved line breaks
+        const textContent = this.notepad.innerText.replace(/\n/g, "\\par\n");
+        rtfContent += "\\f0\\fs24 " + textContent + "\n}";
+        
+        return rtfContent;
+    }
+
     createPDF() {
         const htmlContent = `
             <!DOCTYPE html>
@@ -792,11 +828,21 @@ class NotepadApp {
                 <meta charset="UTF-8">
                 <title>Notepad Export</title>
                 <style>
-                    body { font-family: ${this.notepad.style.fontFamily || 'Arial'}; font-size: ${this.notepad.style.fontSize || '16px'}; }
+                    body { 
+                        font-family: ${this.notepad.style.fontFamily || 'Arial'}; 
+                        font-size: ${this.notepad.style.fontSize || '16px'};
+                        line-height: 1.6;
+                        white-space: pre-wrap;
+                        margin: 40px;
+                    }
+                    p { margin: 0.5em 0; }
+                    a { color: #6366f1; }
+                    img { max-width: 100%; height: auto; }
+                    span { display: inline-block; }
                 </style>
             </head>
             <body>
-                <div style="white-space: pre-wrap;">${this.notepad.innerHTML}</div>
+                ${this.notepad.innerHTML}
             </body>
             </html>
         `;
@@ -811,14 +857,20 @@ class NotepadApp {
         script.onload = () => {
             const element = document.createElement('div');
             element.innerHTML = this.notepad.innerHTML;
+            element.style.fontFamily = this.notepad.style.fontFamily || 'Arial';
+            element.style.fontSize = this.notepad.style.fontSize || '16px';
+            element.style.lineHeight = '1.6';
+            element.style.whiteSpace = 'pre-wrap';
+            element.style.padding = '20px';
             document.body.appendChild(element);
             
             const opt = {
-                margin: [0.5, 0.5, 0.5, 0.5],
+                margin: [0.8, 0.8, 0.8, 0.8],
                 filename: 'note.pdf',
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 },
-                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+                html2canvas: { scale: 2, letterRendering: true, useCORS: true },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
+                preserveStyles: true
             };
             
             html2pdf().from(element).set(opt).save().then(() => {
@@ -837,9 +889,13 @@ class NotepadApp {
         script.onload = () => {
             const { Document, Packer, Paragraph, TextRun } = docx;
             
+            // Split content by line breaks and create paragraphs
             const paragraphs = this.notepad.innerText.split('\n').map(line => {
                 return new Paragraph({
-                    children: [new TextRun(line)]
+                    children: [new TextRun(line)],
+                    spacing: {
+                        after: 200
+                    }
                 });
             });
             
@@ -866,9 +922,6 @@ class NotepadApp {
     showDownloadFormatDialog() {
         const formats = [
             { id: 'txt', name: 'Text (.txt)', icon: 'ri-file-text-line' },
-            { id: 'html', name: 'HTML (.html)', icon: 'ri-html5-line' },
-            { id: 'md', name: 'Markdown (.md)', icon: 'ri-markdown-line' },
-            { id: 'rtf', name: 'Rich Text (.rtf)', icon: 'ri-file-word-line' },
             { id: 'docx', name: 'Word (.docx)', icon: 'ri-file-word-2-line' },
             { id: 'pdf', name: 'PDF (.pdf)', icon: 'ri-file-pdf-line' }
         ];
@@ -1589,30 +1642,53 @@ class NotepadApp {
     }
 
     printNote() {
-        // Store the current state of the page
-        const originalBodyHtml = document.body.innerHTML;
-        const printContent = this.notepad.innerHTML;
+        // Create an iframe to handle printing without affecting the main document
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        document.body.appendChild(iframe);
         
-        // Create a print-friendly version
-        document.body.innerHTML = `
-            <div class="print-container" style="padding: 20px; font-family: ${this.notepad.style.fontFamily || 'Inter, sans-serif'}; font-size: ${this.notepad.style.fontSize || '19px'};">
-                ${printContent}
-            </div>
-        `;
+        // Get the document from the iframe
+        const doc = iframe.contentDocument || iframe.contentWindow.document;
         
-        // Print the page
-        window.print();
+        // Write the necessary HTML content to the iframe
+        doc.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <title>Notepad Print</title>
+                <style>
+                    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
+                    body {
+                        font-family: ${this.notepad.style.fontFamily || 'Inter, sans-serif'};
+                        font-size: ${this.notepad.style.fontSize || '19px'};
+                        line-height: 1.6;
+                        color: #333;
+                        padding: 20px;
+                        white-space: pre-wrap;
+                    }
+                    img { max-width: 100%; height: auto; }
+                    a { color: #6366f1; text-decoration: underline; }
+                    * { box-sizing: border-box; }
+                </style>
+            </head>
+            <body>
+                ${this.notepad.innerHTML}
+            </body>
+            </html>
+        `);
+        doc.close();
         
-        // Restore the original page content
-        document.body.innerHTML = originalBodyHtml;
-        
-        // Reinitialize the app to restore functionality
-        new NotepadApp();
-        
-        // Restore current note
-        if (this.currentNoteId && this.savedNotes[this.currentNoteId]) {
-            this.loadNote(this.currentNoteId);
-        }
+        // Wait for the iframe to load content before printing
+        setTimeout(() => {
+            iframe.contentWindow.focus();
+            iframe.contentWindow.print();
+            
+            // Remove the iframe after printing
+            setTimeout(() => {
+                document.body.removeChild(iframe);
+            }, 500);
+        }, 300);
     }
 }
 
