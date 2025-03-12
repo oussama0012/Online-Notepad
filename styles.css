@@ -12,6 +12,15 @@
     --gradient-bg: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);  
 }
 
+.dark-theme {
+    --bg-primary: #1a202c;
+    --bg-secondary: #2d3748;
+    --text-primary: #e2e8f0;
+    --border-color: #4a5568;
+    --soft-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    --gradient-bg: linear-gradient(135deg, #1a202c 0%, #2c3344 100%);
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -82,6 +91,11 @@ body {
     letter-spacing: 1px;
 }
 
+.dark-theme .ad-placeholder {
+    background-color: rgba(106, 90, 223, 0.15);
+    color: #bbb;
+}
+
 .notepad-container {
     width: 90%;  
     max-width: 1100px;  
@@ -98,6 +112,12 @@ body {
     z-index: 1;
     display: flex;
     flex-direction: column;
+}
+
+.dark-theme .notepad-container {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    border-color: var(--border-color);
 }
 
 .notepad-container.fullscreen-mode {
@@ -184,6 +204,11 @@ body {
     flex-shrink: 0;
 }
 
+.dark-theme .toolbar-section {
+    background-color: #24292e;
+    border-color: #4a5568;
+}
+
 .toolbar-btn {
     background: none;
     border: none;
@@ -219,6 +244,31 @@ body {
     font-size: 1.2rem;
 }
 
+.toolbar-btn::after {
+    content: attr(title);
+    position: absolute;
+    bottom: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+    pointer-events: none;
+    z-index: 1000;
+}
+
+.toolbar-btn:hover::after {
+    opacity: 1;
+    visibility: visible;
+    bottom: -25px;
+}
+
 .font-selector, .font-size-selector {
     padding: 12px 15px;
     border-radius: 8px;
@@ -251,6 +301,13 @@ body {
 
 .font-selector option, .font-size-selector option {
     padding: 10px;
+}
+
+.dark-theme .font-selector, 
+.dark-theme .font-size-selector {
+    background-color: #2d3748;
+    color: #e2e8f0;
+    border-color: #4a5568;
 }
 
 #notepad {
@@ -543,6 +600,12 @@ body {
     margin-bottom: 20px;
     border: 1px solid var(--border-color);
     transition: height 0.3s ease;
+}
+
+.dark-theme .saved-files-container {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    border-color: var(--border-color);
 }
 
 .saved-files-header {
@@ -996,6 +1059,12 @@ body {
     color: #f44336;
 }
 
+.dark-theme .form-group input {
+    background-color: #2d3748;
+    color: #e2e8f0;
+    border-color: #4a5568;
+}
+
 .link-modal, .image-modal {
     max-width: 500px;
 }
@@ -1060,6 +1129,12 @@ body {
     text-align: center;
 }
 
+.dark-theme .tool-description {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+
 .tool-description h2 {
     color: var(--accent-color);
     margin-bottom: 20px;
@@ -1069,9 +1144,13 @@ body {
 .tool-description > p {
     max-width: 800px;
     margin: 0 auto 30px;
-    color: #555;
+    color: #666;
     font-size: 1.1rem;
     line-height: 1.6;
+}
+
+.dark-theme .tool-description > p {
+    color: #a0aec0;
 }
 
 .features-grid {
@@ -1092,6 +1171,12 @@ body {
     flex-direction: column;
     align-items: center;
     text-align: center;
+}
+
+.dark-theme .feature {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    border-color: var(--border-color);
 }
 
 .feature:hover {
@@ -1125,6 +1210,10 @@ body {
     line-height: 1.5;
 }
 
+.dark-theme .feature p {
+    color: #cbd5e0;
+}
+
 .guide-section {
     width: 90%;
     max-width: 1100px;
@@ -1139,6 +1228,12 @@ body {
     border: 1px solid var(--border-color);
     max-width: 1100px;
     margin: 0 auto;
+}
+
+.dark-theme .guide-container {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    border-color: var(--border-color);
 }
 
 .guide-title {
@@ -1190,6 +1285,10 @@ body {
     color: #4a5568;
 }
 
+.dark-theme .guide-content p {
+    color: #cbd5e0;
+}
+
 .faq-section {
     margin-top: 50px;
     border-top: 2px solid var(--border-color);
@@ -1222,6 +1321,16 @@ body {
 .faq-item p {
     color: #555;
     line-height: 1.6;
+}
+
+.dark-theme .faq-item p {
+    color: #cbd5e0;
+}
+
+.editor-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 @media (max-width: 768px) {
@@ -1272,12 +1381,6 @@ body {
     }
 }
 
-.editor-container {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-}
-
 @media (max-width: 768px) {
     .guide-container {
         padding: 30px 20px;
@@ -1308,6 +1411,12 @@ body {
     text-align: center;
     box-shadow: var(--soft-shadow);
     margin-top: 40px;
+}
+
+.dark-theme .footer {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    border-color: var(--border-color);
 }
 
 .footer-menu {
