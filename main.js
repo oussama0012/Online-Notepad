@@ -20,6 +20,9 @@ class NotepadApp {
         this.autoSaveInterval = null;
         this.initAutoSave();
 
+        this.isDarkMode = localStorage.getItem('darkMode') === 'true';
+        this.initTheme();
+
         this.setupEventListeners();
         this.loadSavedNotes();
         this.renderSavedFiles();
@@ -75,6 +78,34 @@ class NotepadApp {
         document.querySelector('[data-action="import"]').addEventListener('click', () => {
             this.importFile();
         });
+        
+        // Add dark mode toggle event listener
+        document.querySelector('[data-action="darkMode"]').addEventListener('click', () => {
+            this.toggleDarkMode();
+        });
+    }
+
+    initTheme() {
+        if (this.isDarkMode) {
+            document.body.classList.add('dark-theme');
+            document.querySelector('[data-action="darkMode"] i').classList.remove('ri-moon-line');
+            document.querySelector('[data-action="darkMode"] i').classList.add('ri-sun-line');
+        }
+    }
+    
+    toggleDarkMode() {
+        this.isDarkMode = !this.isDarkMode;
+        document.body.classList.toggle('dark-theme');
+        localStorage.setItem('darkMode', this.isDarkMode);
+        
+        const darkModeIcon = document.querySelector('[data-action="darkMode"] i');
+        if (this.isDarkMode) {
+            darkModeIcon.classList.remove('ri-moon-line');
+            darkModeIcon.classList.add('ri-sun-line');
+        } else {
+            darkModeIcon.classList.remove('ri-sun-line');
+            darkModeIcon.classList.add('ri-moon-line');
+        }
     }
 
     toggleSavedFilesPanel() {
@@ -326,6 +357,9 @@ class NotepadApp {
                 break;
             case 'import':
                 this.importFile();
+                break;
+            case 'print':
+                this.printNote();
                 break;
             case 'bold':
                 this.applyFormattingWithSelectionPreserved('bold');
@@ -1510,6 +1544,32 @@ class NotepadApp {
         }, 10000); // Auto-save every 10 seconds
     }
 
+    printNote() {
+        // Store the current state of the page
+        const originalBodyHtml = document.body.innerHTML;
+        const printContent = this.notepad.innerHTML;
+        
+        // Create a print-friendly version
+        document.body.innerHTML = `
+            <div class="print-container" style="padding: 20px; font-family: ${this.notepad.style.fontFamily || 'Inter, sans-serif'}; font-size: ${this.notepad.style.fontSize || '19px'};">
+                ${printContent}
+            </div>
+        `;
+        
+        // Print the page
+        window.print();
+        
+        // Restore the original page content
+        document.body.innerHTML = originalBodyHtml;
+        
+        // Reinitialize the app to restore functionality
+        new NotepadApp();
+        
+        // Restore current note
+        if (this.currentNoteId && this.savedNotes[this.currentNoteId]) {
+            this.loadNote(this.currentNoteId);
+        }
+    }
 }
 
 new NotepadApp();
