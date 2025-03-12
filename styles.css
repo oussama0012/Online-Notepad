@@ -1072,6 +1072,7 @@ body {
 .link-form, .image-form {
     margin-bottom: 20px;
     text-align: left;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
 }
 
 #notepad a {
@@ -1106,16 +1107,6 @@ body {
     background-color: #e0e0e0;
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-@keyframes slideUp {
-    from { transform: translateY(30px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
 }
 
 .tool-description {
@@ -1331,6 +1322,34 @@ body {
     flex: 1;
     display: flex;
     flex-direction: column;
+}
+
+/* Context Menu Styles */
+.context-menu {
+    position: absolute;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 5px 0;
+    z-index: 10002;
+}
+
+.context-menu-item {
+    padding: 8px 20px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    color: var(--text-primary);
+    white-space: nowrap;
+}
+
+.context-menu-item:hover {
+    background-color: var(--accent-color);
+    color: white;
+}
+
+.dark-theme .faq-item p {
+    color: #cbd5e0;
 }
 
 @media (max-width: 768px) {
