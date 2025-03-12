@@ -920,6 +920,13 @@ class NotepadApp {
     showEmojiPicker() {
         this.saveSelection();
         
+        // Check if there's no valid selection or if the selection is outside the notepad
+        if (!this.savedRange || !this.notepad.contains(this.savedRange.commonAncestorContainer)) {
+            this.createToast('Please select a location inside the notepad to insert an emoji.', 'warning');
+            this.notepad.focus();
+            return;
+        }
+        
         const backdrop = document.createElement('div');
         backdrop.className = 'emoji-backdrop';
         
@@ -1185,6 +1192,13 @@ class NotepadApp {
     showLinkDialog() {
         this.saveSelection();
         
+        // Check if there's no valid selection or if the selection is outside the notepad
+        if (!this.savedRange || !this.notepad.contains(this.savedRange.commonAncestorContainer)) {
+            this.createToast('Please select a location inside the notepad to insert a link.', 'warning');
+            this.notepad.focus();
+            return;
+        }
+        
         const modal = document.createElement('div');
         modal.className = 'save-modal';
         modal.innerHTML = `
@@ -1339,6 +1353,13 @@ class NotepadApp {
     showImageDialog() {
         this.saveSelection();
         
+        // Check if there's no valid selection or if the selection is outside the notepad
+        if (!this.savedRange || !this.notepad.contains(this.savedRange.commonAncestorContainer)) {
+            this.createToast('Please select a location inside the notepad to insert an image.', 'warning');
+            this.notepad.focus();
+            return;
+        }
+        
         const modal = document.createElement('div');
         modal.className = 'save-modal';
         modal.innerHTML = `
@@ -1418,6 +1439,29 @@ class NotepadApp {
             newRange.collapse(true);
             selection.removeAllRanges();
             selection.addRange(newRange);
+            
+            this.undoStack.push(this.notepad.innerHTML);
+            this.redoStack = [];
+            this.checkForChanges();
+            
+            this.notepad.focus();
+        } else {
+            // If no range is saved, insert at the end of the notepad
+            const img = document.createElement('img');
+            img.src = url;
+            img.alt = alt;
+            img.style.maxWidth = '100%';
+            img.style.height = 'auto';
+            
+            this.notepad.appendChild(img);
+            
+            // Create a new range after the image
+            const selection = window.getSelection();
+            const range = document.createRange();
+            range.setStartAfter(img);
+            range.collapse(true);
+            selection.removeAllRanges();
+            selection.addRange(range);
             
             this.undoStack.push(this.notepad.innerHTML);
             this.redoStack = [];
