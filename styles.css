@@ -615,6 +615,12 @@ body {
     padding: 15px 20px;
     background-color: var(--bg-primary);
     border-bottom: 1px solid var(--border-color);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.saved-files-header:hover {
+    background-color: rgba(106, 90, 223, 0.1);
 }
 
 .saved-files-header h3 {
@@ -636,6 +642,7 @@ body {
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease;
+    background-color: var(--bg-primary);
 }
 
 .toggle-saved-btn:hover {
@@ -1324,6 +1331,46 @@ body {
     flex-direction: column;
 }
 
+.conversion-note {
+    margin: 15px 0;
+    font-size: 14px;
+    color: #666;
+    text-align: center;
+    line-height: 1.5;
+    padding: 10px;
+    border-radius: 8px;
+    background-color: rgba(106, 90, 223, 0.05);
+}
+
+.dark-theme .conversion-note {
+    color: #a0aec0;
+    background-color: rgba(106, 90, 223, 0.1);
+}
+
+#convert-docx-btn {
+    background-color: #4a5568;
+    color: white;
+    box-shadow: 0 4px 12px rgba(74, 85, 104, 0.3);
+}
+
+#convert-docx-btn:hover {
+    background-color: #2d3748;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(74, 85, 104, 0.4);
+}
+
+.export-docx-btn {
+    background-color: var(--accent-color);
+    color: white;
+    box-shadow: 0 4px 12px rgba(106, 90, 223, 0.3);
+}
+
+.export-docx-btn:hover {
+    background-color: var(--accent-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(106, 90, 223, 0.4);
+}
+
 /* Context Menu Styles */
 .context-menu {
     position: absolute;
@@ -1350,6 +1397,21 @@ body {
 
 .dark-theme .faq-item p {
     color: #cbd5e0;
+}
+
+.more-formats-container {
+    border-top: 1px solid var(--border-color);
+    padding-top: 15px;
+}
+
+.show-more-formats {
+    background-color: var(--bg-primary);
+    border: 1px dashed var(--border-color);
+}
+
+.show-more-formats:hover {
+    background-color: rgba(106, 90, 223, 0.05);
+    border-color: var(--accent-color);
 }
 
 @media (max-width: 768px) {
