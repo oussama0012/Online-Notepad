@@ -62,9 +62,17 @@ class NotepadApp {
             this.applyFontSizeWithSelectionPreserved(e.target.value + 'px');
         });
 
-        this.toggleSavedFilesBtn.addEventListener('click', () => {
+        // Make the entire header clickable
+        document.querySelector('.saved-files-header').addEventListener('click', () => {
             this.toggleSavedFilesPanel();
         });
+        
+        // Prevent propagation when clicking the toggle button directly
+        this.toggleSavedFilesBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.toggleSavedFilesPanel();
+        });
+        
         // Update the color picker event listener to use our custom selection-based color change
         // Add listeners to capture the current selection whenever the user clicks or types in the notepad
         this.notepad.addEventListener('mouseup', () => { this.saveSelection(); });
@@ -920,26 +928,21 @@ class NotepadApp {
     }
 
     showDownloadFormatDialog() {
-        const formats = [
-            { id: 'txt', name: 'Text (.txt)', icon: 'ri-file-text-line' },
-            { id: 'docx', name: 'Word (.docx)', icon: 'ri-file-word-2-line' },
-            { id: 'pdf', name: 'PDF (.pdf)', icon: 'ri-file-pdf-line' }
-        ];
-        
         const modal = document.createElement('div');
         modal.className = 'save-modal';
         modal.innerHTML = `
             <div class="save-modal-content download-format-modal">
-                <h3>Choose File Format</h3>
+                <h3>Export File</h3>
                 <div class="format-options horizontal">
-                    ${formats.map(format => `
-                        <div class="format-option" data-format="${format.id}">
-                            <i class="${format.icon}"></i>
-                            <span>${format.name}</span>
-                        </div>
-                    `).join('')}
+                    <div class="format-option" data-format="docx">
+                        <i class="ri-file-word-2-line"></i>
+                        <span>Word (.docx)</span>
+                    </div>
                 </div>
+                <p class="conversion-note">Need other formats? You can convert your .docx file to PDF, TXT and more using external converters after download.</p>
                 <div class="save-modal-buttons">
+                    <button id="export-docx-btn">Export</button>
+                    <button id="convert-docx-btn">Convert</button>
                     <button id="modal-cancel-download">Cancel</button>
                 </div>
             </div>
@@ -948,12 +951,20 @@ class NotepadApp {
         document.body.appendChild(modal);
         
         return new Promise(resolve => {
-            document.querySelectorAll('.format-option').forEach(option => {
-                option.addEventListener('click', () => {
-                    const format = option.dataset.format;
-                    document.body.removeChild(modal);
-                    resolve(format);
-                });
+            document.querySelector('.format-option[data-format="docx"]').addEventListener('click', () => {
+                document.body.removeChild(modal);
+                resolve('docx');
+            });
+            
+            document.getElementById('export-docx-btn').addEventListener('click', () => {
+                document.body.removeChild(modal);
+                resolve('docx');
+            });
+            
+            document.getElementById('convert-docx-btn').addEventListener('click', () => {
+                window.open('https://www.online-convert.com/file-format/docx', '_blank');
+                document.body.removeChild(modal);
+                resolve(null);
             });
             
             document.getElementById('modal-cancel-download').addEventListener('click', () => {
@@ -1667,7 +1678,7 @@ class NotepadApp {
                         padding: 20px;
                         white-space: pre-wrap;
                     }
-                    img { max-width: 100%; height: auto; }
+                    p { margin: 0.5em 0; }
                     a { color: #6366f1; text-decoration: underline; }
                     * { box-sizing: border-box; }
                 </style>
