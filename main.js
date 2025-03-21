@@ -45,6 +45,34 @@ class NotepadApp {
             this.checkForChanges();
         });
         
+        // Handle paste events to retain formatting in a compatible way
+        this.notepad.addEventListener('paste', (e) => {
+            e.preventDefault();
+            
+            // Get clipboard content as HTML and as plain text
+            const htmlContent = e.clipboardData.getData('text/html');
+            const plainText = e.clipboardData.getData('text/plain');
+            
+            // Use HTML if available (to preserve formatting), otherwise use plain text
+            if (htmlContent) {
+                // Create a temporary div to process the HTML
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = htmlContent;
+                
+                // Process HTML to make formats compatible with the editor
+                this.processFormattedPaste(tempDiv);
+                
+                // Insert the processed content
+                document.execCommand('insertHTML', false, tempDiv.innerHTML);
+            } else {
+                document.execCommand('insertText', false, plainText);
+            }
+            
+            // Update undo stack and mark changes
+            this.undoStack.push(this.notepad.innerHTML);
+            this.checkForChanges();
+        });
+        
         // Make the notepad focused when clicked anywhere inside
         this.notepad.addEventListener('click', () => {
             this.notepad.focus();
@@ -93,6 +121,51 @@ class NotepadApp {
         // Add dark mode toggle event listener
         document.querySelector('[data-action="darkMode"]').addEventListener('click', () => {
             this.toggleDarkMode();
+        });
+    }
+
+    processFormattedPaste(container) {
+        // Convert common formatted elements to spans with inline styles
+        const processNode = (node) => {
+            if (node.nodeType === Node.ELEMENT_NODE) {
+                // Process various formatting tags
+                if (node.tagName === 'B' || node.tagName === 'STRONG') {
+                    const span = document.createElement('span');
+                    span.style.fontWeight = 'bold';
+                    while (node.firstChild) {
+                        span.appendChild(node.firstChild);
+                    }
+                    node.parentNode.replaceChild(span, node);
+                    return span;
+                } else if (node.tagName === 'I' || node.tagName === 'EM') {
+                    const span = document.createElement('span');
+                    span.style.fontStyle = 'italic';
+                    while (node.firstChild) {
+                        span.appendChild(node.firstChild);
+                    }
+                    node.parentNode.replaceChild(span, node);
+                    return span;
+                } else if (node.tagName === 'U') {
+                    const span = document.createElement('span');
+                    span.style.textDecoration = 'underline';
+                    while (node.firstChild) {
+                        span.appendChild(node.firstChild);
+                    }
+                    node.parentNode.replaceChild(span, node);
+                    return span;
+                } else {
+                    // Process children recursively
+                    Array.from(node.childNodes).forEach(child => {
+                        processNode(child);
+                    });
+                }
+            }
+            return node;
+        };
+        
+        // Process all nodes in the pasted content
+        Array.from(container.childNodes).forEach(node => {
+            processNode(node);
         });
     }
 
@@ -534,31 +607,136 @@ class NotepadApp {
             selection.removeAllRanges();
             selection.addRange(newRange);
         } else {
-            // Format selected text
-            const selectedContent = range.extractContents();
-            const span = document.createElement('span');
+            // Check if selection is already formatted with the requested style
+            const selectedHtml = range.cloneContents();
+            let isAlreadyFormatted = false;
             
-            // Apply style based on command
-            switch(command) {
-                case 'bold':
-                    span.style.fontWeight = 'bold';
-                    break;
-                case 'italic':
-                    span.style.fontStyle = 'italic';
-                    break;
-                case 'underline':
-                    span.style.textDecoration = 'underline';
-                    break;
+            // Create a temporary element to check the formatting
+            const tempDiv = document.createElement('div');
+            tempDiv.appendChild(selectedHtml);
+            
+            // Check if all selected content has the formatting
+            // This now checks for both span style-based and HTML tag-based formatting
+            const spans = tempDiv.querySelectorAll('span, strong, b, em, i, u');
+            if (spans.length > 0) {
+                isAlreadyFormatted = true;
+                for (const span of spans) {
+                    switch(command) {
+                        case 'bold':
+                            if (span.style.fontWeight !== 'bold' && 
+                                span.tagName !== 'STRONG' && 
+                                span.tagName !== 'B') {
+                                isAlreadyFormatted = false;
+                            }
+                            break;
+                        case 'italic':
+                            if (span.style.fontStyle !== 'italic' && 
+                                span.tagName !== 'EM' && 
+                                span.tagName !== 'I') {
+                                isAlreadyFormatted = false;
+                            }
+                            break;
+                        case 'underline':
+                            if (span.style.textDecoration !== 'underline' && 
+                                span.tagName !== 'U') {
+                                isAlreadyFormatted = false;
+                            }
+                            break;
+                    }
+                    if (!isAlreadyFormatted) break;
+                }
+            } else {
+                // Also check if the whole selection is wrapped in a formatting tag
+                const parentElement = tempDiv.firstChild;
+                if (parentElement && parentElement.nodeType === Node.ELEMENT_NODE) {
+                    switch(command) {
+                        case 'bold':
+                            if (parentElement.tagName === 'STRONG' || parentElement.tagName === 'B') {
+                                isAlreadyFormatted = true;
+                            }
+                            break;
+                        case 'italic':
+                            if (parentElement.tagName === 'EM' || parentElement.tagName === 'I') {
+                                isAlreadyFormatted = true;
+                            }
+                            break;
+                        case 'underline':
+                            if (parentElement.tagName === 'U') {
+                                isAlreadyFormatted = true;
+                            }
+                            break;
+                    }
+                }
             }
             
-            span.appendChild(selectedContent);
-            range.insertNode(span);
+            // Format selected text
+            const selectedContent = range.extractContents();
             
-            // Restore selection around the new span
-            selection.removeAllRanges();
-            const newRange = document.createRange();
-            newRange.selectNode(span);
-            selection.addRange(newRange);
+            if (isAlreadyFormatted) {
+                // Remove formatting
+                const tempDiv = document.createElement('div');
+                tempDiv.appendChild(selectedContent);
+                
+                // Extract text from all spans and remove formatting
+                const newContent = document.createDocumentFragment();
+                const extractTextRecursively = (node) => {
+                    if (node.nodeType === Node.TEXT_NODE) {
+                        newContent.appendChild(document.createTextNode(node.textContent));
+                    } else if (node.nodeType === Node.ELEMENT_NODE) {
+                        if (node.tagName === 'SPAN' || 
+                           node.tagName === 'STRONG' || 
+                           node.tagName === 'B' || 
+                           node.tagName === 'EM' || 
+                           node.tagName === 'I' || 
+                           node.tagName === 'U') {
+                            // For formatted elements, just add their text content without formatting
+                            newContent.appendChild(document.createTextNode(node.textContent));
+                        } else if (node.tagName === 'A') {
+                            // Preserve links but remove other formatting
+                            const link = document.createElement('a');
+                            link.href = node.href;
+                            link.textContent = node.textContent;
+                            link.target = node.target;
+                            link.rel = node.rel;
+                            link.dataset.dynamicLink = node.dataset.dynamicLink;
+                            newContent.appendChild(link);
+                        } else {
+                            // For other elements, preserve them
+                            for (const child of node.childNodes) {
+                                extractTextRecursively(child);
+                            }
+                        }
+                    }
+                };
+                
+                Array.from(tempDiv.childNodes).forEach(extractTextRecursively);
+                range.insertNode(newContent);
+            } else {
+                // Apply new formatting
+                const span = document.createElement('span');
+                
+                // Apply style based on command
+                switch(command) {
+                    case 'bold':
+                        span.style.fontWeight = 'bold';
+                        break;
+                    case 'italic':
+                        span.style.fontStyle = 'italic';
+                        break;
+                    case 'underline':
+                        span.style.textDecoration = 'underline';
+                        break;
+                }
+                
+                span.appendChild(selectedContent);
+                range.insertNode(span);
+                
+                // Restore selection around the new span
+                selection.removeAllRanges();
+                const newRange = document.createRange();
+                newRange.selectNode(span);
+                selection.addRange(newRange);
+            }
         }
         
         if (!this.isUndoRedo) {
@@ -1001,7 +1179,6 @@ class NotepadApp {
                 <h3>Emojis & Special Characters</h3>
                 <button class="emoji-close-btn">&times;</button>
             </div>
-            <input type="text" class="emoji-search" placeholder="Search emojis and special characters...">
             <div class="emoji-tabs">
                 <div class="emoji-tab active" data-tab="emoji">😀 Emojis</div>
                 <div class="emoji-tab" data-tab="special">✓ Special Characters</div>
@@ -1034,12 +1211,6 @@ class NotepadApp {
                 this.loadEmojiTab(tab.dataset.tab);
             });
         });
-        
-        const searchInput = document.querySelector('.emoji-search');
-        searchInput.addEventListener('input', () => {
-            const activeTab = document.querySelector('.emoji-tab.active').dataset.tab;
-            this.loadEmojiTab(activeTab, searchInput.value.toLowerCase());
-        });
     }
     
     loadEmojiTab(tab, searchTerm = '') {
@@ -1065,21 +1236,11 @@ class NotepadApp {
                     '💚', '💙', '💜', '🤎', '🖤', '🤍', '💯', '💢', '💥', '💫'
                 ];
                 
-                if (searchTerm) {
-                    content = '<div class="emoji-grid">';
-                    emojis.forEach(emoji => {
-                        if (emoji.includes(searchTerm)) {
-                            content += `<div class="emoji-item" data-char="${emoji}">${emoji}</div>`;
-                        }
-                    });
-                    content += '</div>';
-                } else {
-                    content = '<div class="emoji-grid">';
-                    emojis.forEach(emoji => {
-                        content += `<div class="emoji-item" data-char="${emoji}">${emoji}</div>`;
-                    });
-                    content += '</div>';
-                }
+                content = '<div class="emoji-grid">';
+                emojis.forEach(emoji => {
+                    content += `<div class="emoji-item" data-char="${emoji}">${emoji}</div>`;
+                });
+                content += '</div>';
                 break;
                 
             case 'special':
@@ -1096,21 +1257,11 @@ class NotepadApp {
                     '≾', '≿', '⊀', '⊁', '⊂', '⊃', '⊄', '⊅', '⊆', '⊇'
                 ];
                 
-                if (searchTerm) {
-                    content = '<div class="special-char-grid">';
-                    specialChars.forEach(char => {
-                        if (char.includes(searchTerm)) {
-                            content += `<div class="special-char-item" data-char="${char}">${char}</div>`;
-                        }
-                    });
-                    content += '</div>';
-                } else {
-                    content = '<div class="special-char-grid">';
-                    specialChars.forEach(char => {
-                        content += `<div class="special-char-item" data-char="${char}">${char}</div>`;
-                    });
-                    content += '</div>';
-                }
+                content = '<div class="special-char-grid">';
+                specialChars.forEach(char => {
+                    content += `<div class="special-char-item" data-char="${char}">${char}</div>`;
+                });
+                content += '</div>';
                 break;
                 
             case 'math':
@@ -1127,21 +1278,11 @@ class NotepadApp {
                     '⋍', '⋎', '⋏', '⋐', '⋑', '⋒', '⋓', '⋔', '⋕', '⋖'
                 ];
                 
-                if (searchTerm) {
-                    content = '<div class="special-char-grid">';
-                    mathSymbols.forEach(char => {
-                        if (char.includes(searchTerm)) {
-                            content += `<div class="special-char-item" data-char="${char}">${char}</div>`;
-                        }
-                    });
-                    content += '</div>';
-                } else {
-                    content = '<div class="special-char-grid">';
-                    mathSymbols.forEach(char => {
-                        content += `<div class="special-char-item" data-char="${char}">${char}</div>`;
-                    });
-                    content += '</div>';
-                }
+                content = '<div class="special-char-grid">';
+                mathSymbols.forEach(char => {
+                    content += `<div class="special-char-item" data-char="${char}">${char}</div>`;
+                });
+                content += '</div>';
                 break;
                 
             case 'arrows':
@@ -1158,21 +1299,11 @@ class NotepadApp {
                     '⇪', '⇫', '⇬', '⇭', '⇮', '⇯', '⇰', '⇱', '⇲', '⇳'
                 ];
                 
-                if (searchTerm) {
-                    content = '<div class="special-char-grid">';
-                    arrows.forEach(char => {
-                        if (char.includes(searchTerm)) {
-                            content += `<div class="special-char-item" data-char="${char}">${char}</div>`;
-                        }
-                    });
-                    content += '</div>';
-                } else {
-                    content = '<div class="special-char-grid">';
-                    arrows.forEach(char => {
-                        content += `<div class="special-char-item" data-char="${char}">${char}</div>`;
-                    });
-                    content += '</div>';
-                }
+                content = '<div class="special-char-grid">';
+                arrows.forEach(char => {
+                    content += `<div class="special-char-item" data-char="${char}">${char}</div>`;
+                });
+                content += '</div>';
                 break;
                 
             case 'currency':
@@ -1185,21 +1316,11 @@ class NotepadApp {
                     '𑿠', '𞋿', '𞲰'
                 ];
                 
-                if (searchTerm) {
-                    content = '<div class="special-char-grid">';
-                    currency.forEach(char => {
-                        if (char.includes(searchTerm)) {
-                            content += `<div class="special-char-item" data-char="${char}">${char}</div>`;
-                        }
-                    });
-                    content += '</div>';
-                } else {
-                    content = '<div class="special-char-grid">';
-                    currency.forEach(char => {
-                        content += `<div class="special-char-item" data-char="${char}">${char}</div>`;
-                    });
-                    content += '</div>';
-                }
+                content = '<div class="special-char-grid">';
+                currency.forEach(char => {
+                    content += `<div class="special-char-item" data-char="${char}">${char}</div>`;
+                });
+                content += '</div>';
                 break;
         }
         
@@ -1561,11 +1682,13 @@ class NotepadApp {
                 this.processImportedFile(file);
                 document.body.removeChild(fileInput);
             }
-        });
+        }, { once: true });  
         
-        fileInput.addEventListener('cancel', () => {
+        // Add click event to handle cancellation
+        document.addEventListener('click', function handleClickOutside() {
             document.body.removeChild(fileInput);
-        });
+            document.removeEventListener('click', handleClickOutside);
+        }, { once: true, delay: 100 });
     }
     
     processImportedFile(file) {
