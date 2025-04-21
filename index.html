@@ -2,7 +2,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="google-adsense-account" content="ca-pub-9779341625505620">
     <title>Online Notepad</title>
 
     <!-- Meta Tags for SEO and Social Media -->
@@ -48,13 +47,25 @@
         }
     }
     </script>
+    <script src="https://unpkg.com/docx@7.1.0/build/index.js"></script>
     
-    <script src="https://analytics.ahrefs.com/analytics.js" data-key="zFCj/31pBf+36QCHg83Qpg" async></script> 
-    
+   
+    <!-- Add docx.js import map for ESM support -->
+    <script type="importmap">
+    {
+      "imports": {
+        "docx": "https://unpkg.com/docx@7.1.0/build/index.js"
+      }
+    }
+    </script>
+    <!-- Add docx.js script for DOCX export -->
+    <script src="https://unpkg.com/docx@7.1.0/build/index.js"></script>
+    <!-- Add print-to-pdf helper script -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
 <body>
-    
-        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9779341625505620"
+    <div class="ad-container top-ad">
+         <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9779341625505620"
      crossorigin="anonymous"></script>
 <!-- 759 -->
 <ins class="adsbygoogle"
@@ -64,7 +75,7 @@
 <script>
      (adsbygoogle = window.adsbygoogle || []).push({});
 </script>
-    
+    </div>
     <div class="saved-files-container" id="savedFilesContainer">
         <div class="saved-files-header">
             <h3>Saved Notes</h3>
@@ -79,7 +90,7 @@
     <div class="main-content">
         <div class="notepad-container">
             <div class="toolbar">
-                <div class="toolbar-section">
+                <div class="toolbar-group">
                     <button class="toolbar-btn" data-action="new" title="New Note">
                         <i class="ri-file-add-line"></i>
                     </button>
@@ -95,40 +106,25 @@
                     <button class="toolbar-btn" data-action="print" title="Print Note">
                         <i class="ri-printer-line"></i>
                     </button>
+                    <div class="word-counter-container">
+                        <span id="word-counter">0 words | 0 characters</span>
+                    </div>
+                </div>
+                
+                <div class="separator"></div>
+                
+                <div class="toolbar-group">
                     <button class="toolbar-btn" data-action="undo" title="Undo">
                         <i class="ri-arrow-go-back-line"></i>
                     </button>
                     <button class="toolbar-btn" data-action="redo" title="Redo">
                         <i class="ri-arrow-go-forward-line"></i>
                     </button>
-                    <button class="toolbar-btn" data-action="fullscreen" title="Fullscreen">
-                        <i class="ri-fullscreen-line"></i>
-                    </button>
-                    <button class="toolbar-btn" data-action="darkMode" title="Toggle Dark Mode">
-                        <i class="ri-moon-line"></i>
-                    </button>
                 </div>
-                <div class="toolbar-section">
-                    <button class="toolbar-btn" data-action="bold" title="Bold">
-                        <i class="ri-bold"></i>
-                    </button>
-                    <button class="toolbar-btn" data-action="italic" title="Italic">
-                        <i class="ri-italic"></i>
-                    </button>
-                    <button class="toolbar-btn" data-action="underline" title="Underline">
-                        <i class="ri-underline"></i>
-                    </button>
-                    <button class="toolbar-btn" data-action="emoji" title="Emoji & Characters">
-                        <i class="ri-emotion-line"></i>
-                    </button>
-                    <button class="toolbar-btn" data-action="link" title="Insert Link">
-                        <i class="ri-link"></i>
-                    </button>
-                    <button class="toolbar-btn" data-action="image" title="Insert Image">
-                        <i class="ri-image-line"></i>
-                    </button>
-                </div>
-                <div class="toolbar-section">
+                
+                <div class="separator"></div>
+                
+                <div class="toolbar-group">
                     <select id="fontSelector" class="font-selector">
                         <option value="'Inter', sans-serif">Inter (Default)</option>
                         <option value="'Arial', sans-serif">Arial</option>
@@ -163,8 +159,7 @@
                         <option value="'Oswald', sans-serif">Oswald</option>
                         <option value="'Playfair Display', serif">Playfair Display</option>
                     </select>
-                </div>
-                <div class="toolbar-section">
+                    
                     <select id="fontSizeSelector" class="font-size-selector">
                         <option value="12">12px</option>
                         <option value="14">14px</option>
@@ -185,14 +180,111 @@
                         <option value="72">72px</option>
                     </select>
                 </div>
+                
+                <div class="separator"></div>
+                
+                <div class="toolbar-group">
+                    <button class="toolbar-btn" data-action="bold" title="Bold">
+                        <i class="ri-bold"></i>
+                    </button>
+                    <button class="toolbar-btn" data-action="italic" title="Italic">
+                        <i class="ri-italic"></i>
+                    </button>
+                    <button class="toolbar-btn" data-action="underline" title="Underline">
+                        <i class="ri-underline"></i>
+                    </button>
+                    <button class="toolbar-btn" data-action="strikethrough" title="Strikethrough">
+                        <i class="ri-strikethrough"></i>
+                    </button>
+                </div>
+                
+                <div class="separator"></div>
+                
+                <div class="toolbar-group">
+                    <button class="toolbar-btn" data-action="justifyLeft" title="Align Left">
+                        <i class="ri-align-left"></i>
+                    </button>
+                    <button class="toolbar-btn" data-action="justifyCenter" title="Align Center">
+                        <i class="ri-align-center"></i>
+                    </button>
+                    <button class="toolbar-btn" data-action="justifyRight" title="Align Right">
+                        <i class="ri-align-right"></i>
+                    </button>
+                    <button class="toolbar-btn" data-action="justifyFull" title="Justify">
+                        <i class="ri-align-justify"></i>
+                    </button>
+                </div>
+                
+                <div class="separator"></div>
+                
+                <div class="toolbar-group">
+                    <button class="toolbar-btn" data-action="insertOrderedList" title="Numbered List">
+                        <i class="ri-list-ordered"></i>
+                    </button>
+                    <button class="toolbar-btn" data-action="insertUnorderedList" title="Bulleted List">
+                        <i class="ri-list-unordered"></i>
+                    </button>
+                </div>
+                
+                <div class="separator"></div>
+                
+                <div class="toolbar-group">
+                    <button class="toolbar-btn" data-action="link" title="Insert Link">
+                        <i class="ri-link"></i>
+                    </button>
+                    <button class="toolbar-btn" data-action="unlink" title="Remove Link">
+                        <i class="ri-link-unlink-m"></i>
+                    </button>
+                    <button class="toolbar-btn" data-action="image" title="Insert Image">
+                        <i class="ri-image-line"></i>
+                    </button>
+                </div>
+                
+                <div class="separator"></div>
+                
+                <div class="toolbar-group">
+                    <input type="color" id="textColor" class="color-input" title="Text Color">
+                    <input type="color" id="highlightColor" value="#ffff00" class="color-input" title="Highlight Color">
+                </div>
+                
+                <div class="separator"></div>
+                
+                <div class="toolbar-group">
+                    <button class="toolbar-btn" data-action="table" title="Insert Table">
+                        <i class="ri-table-line"></i>
+                    </button>
+                    <button class="toolbar-btn" data-action="blockquote" title="Insert Blockquote">
+                        <i class="ri-double-quotes-l"></i>
+                    </button>
+                    <button class="toolbar-btn" data-action="horizontalLine" title="Insert Horizontal Line">
+                        <i class="ri-separator"></i>
+                    </button>
+                    <button class="toolbar-btn" data-action="findReplace" title="Find and Replace">
+                        <i class="ri-find-replace-line"></i>
+                    </button>
+                    <button class="toolbar-btn" data-action="removeFormat" title="Clear Formatting">
+                        <i class="ri-format-clear"></i>
+                    </button>
+                </div>
+                
+                <div class="separator"></div>
+                
+                <div class="toolbar-group">
+                    <button class="toolbar-btn" data-action="fullscreen" title="Fullscreen">
+                        <i class="ri-fullscreen-line"></i>
+                    </button>
+                    <button class="toolbar-btn" data-action="darkMode" title="Toggle Dark Mode">
+                        <i class="ri-moon-line"></i>
+                    </button>
+                </div>
             </div>
             <div class="editor-container">
                 <div id="notepad" contenteditable="true" spellcheck="true" placeholder="Start typing your notes here..."></div>
             </div>
         </div>
     </div>
-    
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9779341625505620"
+    <div class="ad-container bottom-ad">
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9779341625505620"
      crossorigin="anonymous"></script>
 <!-- aaa2025 -->
 <ins class="adsbygoogle"
@@ -202,7 +294,7 @@
 <script>
      (adsbygoogle = window.adsbygoogle || []).push({});
 </script>
-    
+    </div>
     <div class="tool-description">
         <h1>Free Online Notepad: Write, Save, and Share Your Notes</h1>
         <p>Our Online Notepad is a feature-rich text editor designed for seamless note-taking, writing, and document management. With a clean interface and powerful formatting tools, it helps you capture your thoughts with style and precision - no installation required.</p>
@@ -315,7 +407,7 @@
                 <h3>Privacy and Data in Our Online Notepad</h3>
                 <p>Your notes stay on your computer. Our notepad tool doesn't send them to any server.</p>
                 <p>Notes save in your browser's local storage. They remain in your storage until you delete them.</p>
-                <p>Clearing your browser data will remove your saved notes from the online notepad saved list.</p>
+                <p>Clearing your browser data will remove your saved notes from the online notepad.</p>
                 <p>Export important notes to your computer for backup outside the online notepad.</p>
             </div>
             
@@ -379,18 +471,20 @@
             <li><a href="about-me.html">About</a></li>
             <li><a href="privacy-policy.html">Privacy Policy</a></li>
             <li><a href="contact-us.html">Contact Us</a></li>
-            <a href="https://startupfa.me/s/online-notepad?utm_source=onlinenotepad.space" target="_blank">
+        </ul>
+    </footer>
+    <a href="https://startupfa.me/s/online-notepad?utm_source=onlinenotepad.space" target="_blank">
   <img src="https://startupfa.me/badges/featured-badge-small.webp" alt="Online Notepad - Write, Save, and Share Your Notes | Startup Fame" width="224" height="36" />
 </a>
-<a href="https://twelve.tools" target="_blank"><img src="https://twelve.tools/badge0-white.svg" alt="Featured on Twelve Tools" width="200" height="54"></a>
-        </ul>
+    <a href="https://twelve.tools" target="_blank"><img src="https://twelve.tools/badge0-white.svg" alt="Featured on Twelve Tools" width="200" height="54"></a>
+    </ul>
         <a href="https://www.toolpilot.ai/">
   <img src="https://www.toolpilot.ai/cdn/shop/files/tp-b-h_bec97d1a-5538-498b-8a26-77de74f90ed5_1692x468_crop_center.svg?v=1695882612" alt="Description" style="width:200px;">
 </a>
-        <a href="https://sprunkid.com/">Sprunkid</a>
-        <a href="https://yo.directory/" target="_blank" ><img src="https://cdn.prod.website-files.com/65c1546fa73ea974db789e3d/65e1e171f89ebfa7bd0129ac_yodirectory-featured.png" alt="yo.directory" style="width: 150px; height: 54px;" width="150" height="54"/></a>
-    </footer>
+    <a href="https://sprunkid.com/">Sprunkid</a>
     
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="main.js" type="module"></script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+    <script src="https://unpkg.com/docx@7.1.0/build/index.js"></script>
+    <script src="main.js"></script>
 </body>
 </html>
