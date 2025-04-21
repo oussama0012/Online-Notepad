@@ -433,8 +433,7 @@ class NotepadApp {
                 break;
                 
             case 'unlink':
-                document.execCommand('unlink');
-                this.showToast('Link removed', 'success');
+                this.removeLink();
                 break;
                 
             case 'image':
@@ -1599,6 +1598,81 @@ class NotepadApp {
                 }
             ]
         });
+    }
+
+    removeLink() {
+        const selection = window.getSelection();
+        if (!selection.rangeCount) return;
+        
+        const range = selection.getRangeAt(0);
+        let commonAncestor = range.commonAncestorContainer;
+        
+        // If the selection is inside text node, get its parent
+        if (commonAncestor.nodeType === Node.TEXT_NODE) {
+            commonAncestor = commonAncestor.parentNode;
+        }
+        
+        // Find all links in the selection
+        const links = [];
+        
+        // If the common ancestor is a link
+        if (commonAncestor.tagName === 'A') {
+            links.push(commonAncestor);
+        } else {
+            // Find all links within the selection
+            const selectedNodes = this.getNodesInRange(range);
+            for (const node of selectedNodes) {
+                if (node.tagName === 'A') {
+                    links.push(node);
+                } else if (node.nodeType === Node.ELEMENT_NODE) {
+                    const nestedLinks = node.querySelectorAll('a');
+                    nestedLinks.forEach(link => links.push(link));
+                }
+            }
+        }
+        
+        // Unwrap all found links
+        for (const link of links) {
+            this.unwrapElement(link);
+        }
+        
+        if (links.length > 0) {
+            this.showToast('Link removed', 'success');
+        }
+    }
+    
+    unwrapElement(element) {
+        // Replace the element with its children
+        while (element.firstChild) {
+            element.parentNode.insertBefore(element.firstChild, element);
+        }
+        // Remove the original element
+        element.parentNode.removeChild(element);
+    }
+    
+    getNodesInRange(range) {
+        const nodes = [];
+        const walker = document.createTreeWalker(
+            range.commonAncestorContainer,
+            NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT,
+            { 
+                acceptNode: function(node) {
+                    return NodeFilter.FILTER_ACCEPT;
+                }
+            },
+            false
+        );
+        
+        let currentNode = walker.currentNode;
+        
+        while (currentNode) {
+            if (range.intersectsNode(currentNode)) {
+                nodes.push(currentNode);
+            }
+            currentNode = walker.nextNode();
+        }
+        
+        return nodes;
     }
     
     insertTable() {
