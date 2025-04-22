@@ -149,6 +149,7 @@ body.has-fullscreen {
     position: sticky;
     top: 0;
     z-index: 10001; 
+    margin-top: 10px;
 }
 
 .notepad-container.fullscreen-mode .editor-container {
